@@ -21,6 +21,7 @@ This version has breaking changes — APIs, conventions, and file structure may 
 | `pnpm build` | Production build |
 | `pnpm lint` | Lint (only check — no typecheck or test) |
 | `pnpm dlx shadcn@latest add <name>` | Add shadcn/ui component |
+| `pnpm knip` | Find unused files, exports, and dependencies |
 
 ## Conventions
 
