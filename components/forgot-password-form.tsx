@@ -9,14 +9,13 @@ import {
 } from "@/components/ui/card"
 import {
     Field,
-    FieldDescription,
     FieldGroup,
     FieldLabel,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import Link from "next/link"
 
-export function LoginForm({
+export function ForgotPasswordForm({
     className,
     ...props
 }: React.ComponentProps<"div">) {
@@ -24,9 +23,9 @@ export function LoginForm({
         <div className={cn("flex flex-col gap-6", className)} {...props}>
             <Card>
                 <CardHeader>
-                    <CardTitle>Login to your account</CardTitle>
+                    <CardTitle>Forgot password</CardTitle>
                     <CardDescription>
-                        Enter your email below to login to your account
+                        Enter your email and we&apos;ll send you a reset link
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -42,30 +41,15 @@ export function LoginForm({
                                 />
                             </Field>
                             <Field>
-                                <div className="flex items-center">
-                                    <FieldLabel htmlFor="password">Password</FieldLabel>
-                                    <Link
-                                        href="/forgot-password"
-                                        className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
-                                    >
-                                        Forgot your password?
-                                    </Link>
-                                </div>
-                                <Input id="password" type="password" required />
-                            </Field>
-                            <Field>
-                                <Button type="submit">Login</Button>
-                                <Button variant="outline" type="button">
-                                    Login with Google
-                                </Button>
-                                <FieldDescription className="text-center">
-                                    Don&apos;t have an account? <Link href={`/signup`}>Sign up</Link>
-                                </FieldDescription>
+                                <Button type="submit">Send Reset Link</Button>
                             </Field>
                         </FieldGroup>
                     </form>
                 </CardContent>
             </Card>
+            <div className="text-center text-sm">
+                Remember your password? <Link href="/login" className="underline underline-offset-4">Sign in</Link>
+            </div>
         </div>
     )
 }
