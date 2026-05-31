@@ -1,3 +1,8 @@
+"use client"
+
+import { useState } from "react"
+import { useRouter } from "next/navigation"
+import Link from "next/link"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
@@ -14,12 +19,39 @@ import {
     FieldLabel,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import Link from "next/link"
+import { login } from "@/lib/services/auth"
+import { useAuthStore } from "@/lib/stores/auth-store"
 
 export function LoginForm({
     className,
     ...props
 }: React.ComponentProps<"div">) {
+    const router = useRouter()
+    const setAuth = useAuthStore((s) => s.setAuth)
+
+    const [email, setEmail] = useState("")
+    const [password, setPassword] = useState("")
+    const [error, setError] = useState("")
+    const [loading, setLoading] = useState(false)
+
+    async function handleSubmit(e: React.FormEvent) {
+        e.preventDefault()
+        setError("")
+        setLoading(true)
+
+        try {
+            const { data } = await login(email, password)
+
+            setAuth(data.user, data.access_token, data.refresh_token)
+            router.push(data.user.needsOnboarding ? "/onboarding" : "/dashboard");
+        } catch (err: unknown) {
+            const message = (err as { response?: { data?: { message?: string } } })?.response?.data?.message
+            setError(message || "Invalid email or password")
+        } finally {
+            setLoading(false)
+        }
+    }
+
     return (
         <div className={cn("flex flex-col gap-6", className)} {...props}>
             <Card>
@@ -30,7 +62,7 @@ export function LoginForm({
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <form>
+                    <form onSubmit={handleSubmit}>
                         <FieldGroup>
                             <Field>
                                 <FieldLabel htmlFor="email">Email</FieldLabel>
@@ -38,6 +70,8 @@ export function LoginForm({
                                     id="email"
                                     type="email"
                                     placeholder="m@example.com"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
                                     required
                                 />
                             </Field>
@@ -51,15 +85,26 @@ export function LoginForm({
                                         Forgot your password?
                                     </Link>
                                 </div>
-                                <Input id="password" type="password" required />
+                                <Input
+                                    id="password"
+                                    type="password"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    required
+                                />
                             </Field>
+                            {error && (
+                                <p className="text-sm text-destructive">{error}</p>
+                            )}
                             <Field>
-                                <Button type="submit">Login</Button>
-                                <Button variant="outline" type="button">
+                                <Button type="submit" disabled={loading}>
+                                    {loading ? "Logging in..." : "Login"}
+                                </Button>
+                                <Button variant="outline" type="button" disabled={loading}>
                                     Login with Google
                                 </Button>
                                 <FieldDescription className="text-center">
-                                    Don&apos;t have an account? <Link href={`/signup`}>Sign up</Link>
+                                    Don&apos;t have an account? <Link href="/signup">Sign up</Link>
                                 </FieldDescription>
                             </Field>
                         </FieldGroup>
