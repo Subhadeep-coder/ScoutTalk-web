@@ -20,3 +20,7 @@ export function forgotPassword(email: string) {
 export function resetPassword(token: string, password: string) {
   return http.post("/auth/reset-password", { token, password })
 }
+
+export function verifyEmail(token: string) {
+  return http.post("/auth/verify-email", { token })
+}

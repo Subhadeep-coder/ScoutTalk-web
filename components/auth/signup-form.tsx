@@ -1,8 +1,8 @@
 "use client"
 
 import { useState } from "react"
-import { useRouter } from "next/navigation"
 import Link from "next/link"
+import { MailCheck } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
     Card,
@@ -19,12 +19,8 @@ import {
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { signup } from "@/lib/services/auth"
-import { useAuthStore } from "@/lib/stores/auth-store"
 
 export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
-    const router = useRouter()
-    const setAuth = useAuthStore((s) => s.setAuth)
-
     const [firstName, setFirstName] = useState("")
     const [lastName, setLastName] = useState("")
     const [email, setEmail] = useState("")
@@ -32,6 +28,7 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
     const [confirmPassword, setConfirmPassword] = useState("")
     const [error, setError] = useState("")
     const [loading, setLoading] = useState(false)
+    const [successEmail, setSuccessEmail] = useState("")
 
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault()
@@ -45,10 +42,8 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
         setLoading(true)
 
         try {
-            const { data } = await signup(email, password, firstName, lastName)
-
-            setAuth(data.user, data.access_token, data.refresh_token)
-            router.push("/onboarding");
+            await signup(email, password, firstName, lastName)
+            setSuccessEmail(email)
         } catch (err: unknown) {
             const status = (err as { response?: { status?: number; data?: { message?: string } } })?.response?.status
             const message = (err as { response?: { data?: { message?: string } } })?.response?.data?.message
@@ -61,6 +56,36 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
         } finally {
             setLoading(false)
         }
+    }
+
+    if (successEmail) {
+        return (
+            <Card {...props}>
+                <CardHeader className="text-center">
+                    <div className="mx-auto mb-2 flex size-12 items-center justify-center rounded-full bg-primary/10">
+                        <MailCheck className="size-6 text-primary" />
+                    </div>
+                    <CardTitle>Check your email</CardTitle>
+                    <CardDescription>
+                        We&apos;ve sent a verification link to{" "}
+                        <span className="font-medium text-foreground">{successEmail}</span>
+                    </CardDescription>
+                </CardHeader>
+                <CardContent className="flex flex-col gap-3 text-center text-sm text-muted-foreground">
+                    <p>Click the link in the email to verify your account and get started.</p>
+                    <p>
+                        Didn&apos;t receive it?{" "}
+                        <button
+                            type="button"
+                            onClick={() => setSuccessEmail("")}
+                            className="underline underline-offset-4 hover:text-foreground"
+                        >
+                            Try again
+                        </button>
+                    </p>
+                </CardContent>
+            </Card>
+        )
     }
 
     return (
