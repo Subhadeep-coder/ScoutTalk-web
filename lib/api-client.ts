@@ -34,8 +34,8 @@ apiClient.interceptors.response.use(
           { refresh_token: refreshToken },
         )
 
-        useAuthStore.getState().setTokens(data.accessToken, data.refreshToken)
-        originalRequest.headers.Authorization = `Bearer ${data.accessToken}`
+        useAuthStore.getState().setTokens(data.access_token, data.refresh_token)
+        originalRequest.headers.Authorization = `Bearer ${data.access_token}`
         return apiClient(originalRequest)
       } catch {
         useAuthStore.getState().logout()
