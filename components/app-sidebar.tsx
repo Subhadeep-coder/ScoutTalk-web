@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useState } from "react"
 import Link from "next/link"
 import { Users } from "lucide-react"
 
@@ -19,6 +20,8 @@ import {
 } from "@/components/ui/sidebar"
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const [serverRefreshKey, setServerRefreshKey] = useState(0)
+
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
@@ -34,10 +37,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <Separator />
       </SidebarHeader>
       <SidebarContent>
-        <NavServers />
-        <Separator />
+        <NavServers key={serverRefreshKey} />
         <SidebarMenu>
-          <CreateServerDialog />
+          <CreateServerDialog onCreated={() => setServerRefreshKey((k) => k + 1)} />
         </SidebarMenu>
       </SidebarContent>
       <SidebarFooter>

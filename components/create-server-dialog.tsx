@@ -23,20 +23,18 @@ import {
 } from "@/components/ui/sidebar"
 import { TooltipWrapper } from "@/components/ui/tooltip-wrapper"
 import { useAuthStore } from "@/lib/stores/auth-store"
+import { createServer, uploadServerAvatar } from "@/lib/services/servers"
 
-function readFileAsDataURL(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader()
-    reader.onload = () => resolve(reader.result as string)
-    reader.onerror = reject
-    reader.readAsDataURL(file)
-  })
-}
+type CreateServerDialogProps = Readonly<{
+  onCreated?: () => void
+}>
 
-export function CreateServerDialog() {
+export function CreateServerDialog({ onCreated }: CreateServerDialogProps) {
   const [open, setOpen] = useState(false)
   const [name, setName] = useState("")
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null)
+  const [avatarFile, setAvatarFile] = useState<File | null>(null)
+  const [creating, setCreating] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const user = useAuthStore((s) => s.user)
 
@@ -45,6 +43,7 @@ export function CreateServerDialog() {
 
   const processFile = useCallback(async (file: File) => {
     if (!file.type.startsWith("image/")) return
+    setAvatarFile(file)
     const dataUrl = await readFileAsDataURL(file)
     setAvatarPreview(dataUrl)
   }, [])
@@ -82,16 +81,31 @@ export function CreateServerDialog() {
     setOpen(false)
     setName("")
     setAvatarPreview(null)
+    setAvatarFile(null)
   }, [])
 
   const handleSubmit = useCallback(
-    (e: React.FormEvent) => {
+    async (e: React.FormEvent) => {
       e.preventDefault()
-      if (!name.trim()) return
-      // TODO: call create server API with name and avatarPreview
-      resetForm()
+      if (!name.trim() || creating) return
+
+      setCreating(true)
+      try {
+        const { data: server } = await createServer(name.trim())
+
+        if (avatarFile) {
+          await uploadServerAvatar(server.id, avatarFile)
+        }
+
+        onCreated?.()
+        resetForm()
+      } catch {
+        // TODO: show error toast
+      } finally {
+        setCreating(false)
+      }
     },
-    [name, resetForm],
+    [name, avatarFile, creating, onCreated, resetForm],
   )
 
   return (
@@ -147,6 +161,7 @@ export function CreateServerDialog() {
                         size="icon"
                         onClick={() => {
                           setAvatarPreview(null)
+                          setAvatarFile(null)
                           if (fileInputRef.current) fileInputRef.current.value = ""
                         }}
                         className="size-8 text-red-500 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950"
@@ -186,8 +201,8 @@ export function CreateServerDialog() {
               </div>
             </div>
             <DialogFooter>
-              <Button type="submit" disabled={!name.trim()}>
-                Create
+              <Button type="submit" disabled={!name.trim() || creating}>
+                {creating ? "Creating..." : "Create"}
               </Button>
             </DialogFooter>
           </form>
@@ -195,4 +210,13 @@ export function CreateServerDialog() {
       </Dialog>
     </SidebarMenuItem>
   )
+}
+
+function readFileAsDataURL(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => resolve(reader.result as string)
+    reader.onerror = reject
+    reader.readAsDataURL(file)
+  })
 }
