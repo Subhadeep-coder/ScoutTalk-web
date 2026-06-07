@@ -1,4 +1,5 @@
 import axios from "axios"
+import apiClient from "@/lib/api-client"
 
 const http = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
@@ -23,4 +24,8 @@ export function resetPassword(token: string, password: string) {
 
 export function verifyEmail(token: string) {
   return http.post("/auth/verify-email", { token })
+}
+
+export function logout() {
+  return apiClient.post("/auth/logout")
 }
