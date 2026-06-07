@@ -1,99 +1,55 @@
 "use client"
 
-import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
-import { LogOut } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { AppSidebar } from "@/components/app-sidebar"
 import {
-    Card,
-    CardContent,
-    CardHeader,
-    CardTitle,
-} from "@/components/ui/card"
-import apiClient from "@/lib/api-client"
-import { useAuthStore } from "@/lib/stores/auth-store"
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb"
+import { Separator } from "@/components/ui/separator"
+import {
+  SidebarInset,
+  SidebarProvider,
+} from "@/components/ui/sidebar"
 
-type UserProfile = {
-    id: string
-    googleId: string | null
-    email: string
-    username: string
-    firstName: string
-    lastName: string
-    displayName: string | null
-    avatar: string | null
-    needsOnboarding: boolean
-    createdAt: string
-    updatedAt: string
-}
-
-export default function DashboardPage() {
-    const router = useRouter()
-    const refreshToken = useAuthStore((s) => s.refreshToken)
-    const logout = useAuthStore((s) => s.logout)
-
-    const [profile, setProfile] = useState<UserProfile | null>(null)
-    const [loading, setLoading] = useState(true)
-
-    useEffect(() => {
-        apiClient
-            .get<UserProfile>("/users/me")
-            .then(({ data }) => setProfile(data))
-            .catch(() => router.push("/login"))
-            .finally(() => setLoading(false))
-    }, [router])
-
-    async function handleLogout() {
-        try {
-            await apiClient.post("/auth/logout", { refresh_token: refreshToken })
-        } catch {
-            // proceed with local logout regardless
-        }
-        logout()
-        router.push("/login")
-    }
-
-    if (loading) {
-        return (
-            <div className="flex min-h-svh items-center justify-center">
-                <p className="text-muted-foreground">Loading...</p>
-            </div>
-        )
-    }
-
-    return (
-        <div className="flex min-h-svh items-center justify-center p-6">
-            <Card className="w-full max-w-md">
-                <CardHeader>
-                    <CardTitle>Dashboard</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                    <div>
-                        <span className="text-sm text-muted-foreground">Name</span>
-                        <p className="font-medium">{profile?.firstName} {profile?.lastName}</p>
-                    </div>
-                    <div>
-                        <span className="text-sm text-muted-foreground">Email</span>
-                        <p className="font-medium">{profile?.email}</p>
-                    </div>
-                    <div>
-                        <span className="text-sm text-muted-foreground">Username</span>
-                        <p className="font-medium">{profile?.username}</p>
-                    </div>
-                    <div>
-                        <span className="text-sm text-muted-foreground">Joined</span>
-                        <p className="font-medium">
-                            {profile?.createdAt
-                                ? new Date(profile.createdAt).toLocaleDateString()
-                                : "-"}
-                        </p>
-                    </div>
-                    <Button onClick={handleLogout} variant="outline" className="w-full">
-                        <LogOut />
-                        Logout
-                    </Button>
-                </CardContent>
-            </Card>
+export default function Page() {
+  return (
+    <SidebarProvider defaultOpen={false} onOpenChange={() => {}}>
+      <AppSidebar />
+      <SidebarInset>
+        <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
+          <div className="flex items-center gap-2 px-4">
+            <Separator
+              orientation="vertical"
+              className="mr-2 data-[orientation=vertical]:h-4"
+            />
+            <Breadcrumb>
+              <BreadcrumbList>
+                <BreadcrumbItem className="hidden md:block">
+                  <BreadcrumbLink href="#">
+                    Build Your Application
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator className="hidden md:block" />
+                <BreadcrumbItem>
+                  <BreadcrumbPage>Data Fetching</BreadcrumbPage>
+                </BreadcrumbItem>
+              </BreadcrumbList>
+            </Breadcrumb>
+          </div>
+        </header>
+        <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
+          <div className="grid auto-rows-min gap-4 md:grid-cols-3">
+            <div className="aspect-video rounded-xl bg-muted/50" />
+            <div className="aspect-video rounded-xl bg-muted/50" />
+            <div className="aspect-video rounded-xl bg-muted/50" />
+          </div>
+          <div className="min-h-[100vh] flex-1 rounded-xl bg-muted/50 md:min-h-min" />
         </div>
-    )
+      </SidebarInset>
+    </SidebarProvider>
+  )
 }
