@@ -4,6 +4,7 @@ import { useState } from "react"
 
 import AttachmentButton from "./attachment-button"
 import EmojiButton from "./emoji-button"
+import FilePreview from "./file-preview"
 import GifButton from "./gif-button"
 import MessageInput from "./message-input"
 import SendButton from "./send-button"
@@ -16,6 +17,7 @@ type ChatInputProps = Readonly<{
 
 export default function ChatInput({ channelName, channelId }: ChatInputProps) {
   const [message, setMessage] = useState("")
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const sendAndRefresh = useMessageStore((s) => s.sendAndRefresh)
   const loading = useMessageStore((s) => s.loading)
 
@@ -35,17 +37,22 @@ export default function ChatInput({ channelName, channelId }: ChatInputProps) {
 
   return (
     <div className="border-t p-4">
-      <div className="flex items-center gap-1.5 rounded-lg border bg-muted/50 px-3 py-1.5">
-        <AttachmentButton />
-        <EmojiButton onEmojiSelect={(emoji) => setMessage((prev) => prev + emoji)} />
-        <GifButton onGifSelect={(url) => console.log("GIF selected:", url)} />
-        <MessageInput
-          channelName={channelName}
-          value={message}
-          onChange={setMessage}
-          onSend={handleSend}
-        />
-        <SendButton onSend={handleSend} disabled={sending || !message.trim()} />
+      <div className="flex flex-col gap-2 rounded-lg border bg-muted/50 px-3 py-1.5">
+        {selectedFile && (
+          <FilePreview file={selectedFile} onRemove={() => setSelectedFile(null)} />
+        )}
+        <div className="flex items-center gap-1.5">
+          <AttachmentButton onFileSelect={setSelectedFile} />
+          <EmojiButton onEmojiSelect={(emoji) => setMessage((prev) => prev + emoji)} />
+          <GifButton onGifSelect={(url) => console.log("GIF selected:", url)} />
+          <MessageInput
+            channelName={channelName}
+            value={message}
+            onChange={setMessage}
+            onSend={handleSend}
+          />
+          <SendButton onSend={handleSend} disabled={sending || !message.trim()} />
+        </div>
       </div>
     </div>
   )

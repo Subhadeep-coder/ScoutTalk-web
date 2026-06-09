@@ -1,13 +1,28 @@
 "use client"
 
+import { useRef } from "react"
 import { Paperclip } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 
-export default function AttachmentButton() {
+type AttachmentButtonProps = Readonly<{
+  onFileSelect: (file: File) => void
+}>
+
+export default function AttachmentButton({ onFileSelect }: AttachmentButtonProps) {
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (file) {
+      onFileSelect(file)
+      if (inputRef.current) inputRef.current.value = ""
+    }
+  }
+
   return (
     <label>
-      <input type="file" className="hidden" />
+      <input ref={inputRef} type="file" className="hidden" onChange={handleChange} />
       <Button
         type="button"
         variant="ghost"
