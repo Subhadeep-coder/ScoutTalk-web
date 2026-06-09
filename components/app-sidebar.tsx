@@ -9,6 +9,7 @@ import { CreateServerDialog } from "@/components/create-server-dialog"
 import { NavServers } from "@/components/nav-servers"
 import { NavUser } from "@/components/nav-user"
 import { Separator } from "@/components/ui/separator"
+import { useServerStore } from "@/lib/stores/server-store"
 import {
   Sidebar,
   SidebarContent,
@@ -28,7 +29,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <SidebarMenu>
           <SidebarMenuItem className="flex justify-center">
             <SidebarMenuButton size="lg" className="justify-center" asChild>
-              <Link href="/dashboard">
+              <Link href="/dashboard" onClick={() => useServerStore.getState().setActiveServerId(null)}>
                 <Users className="size-5" />
               </Link>
             </SidebarMenuButton>
