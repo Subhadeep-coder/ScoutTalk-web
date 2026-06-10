@@ -9,14 +9,20 @@ export type MessageAuthor = {
   avatar: string | null
 }
 
+export type AttachmentData = {
+  url: string
+  type: string
+  name: string
+}
+
 export type Message = {
   id: string
   authorId: string
   channelId: string
   serverId: string
   parentId: string | null
-  content: string
-  attachments: string | null
+  content: string | null
+  attachments: AttachmentData[] | null
   createdAt: string
   updatedAt: string
   author: MessageAuthor
@@ -26,6 +32,19 @@ export function getMessages(channelId: string) {
   return apiClient.get<Message[]>(`/channels/${channelId}/messages`)
 }
 
-export function sendMessage(channelId: string, content: string) {
-  return apiClient.post(`/channels/${channelId}/messages`, { content })
+export function sendMessage(channelId: string, content: string, attachments?: AttachmentData[]) {
+  const body: Record<string, unknown> = {}
+  if (content) body.content = content
+  if (attachments && attachments.length > 0) body.attachments = attachments
+  return apiClient.post(`/channels/${channelId}/messages`, body)
+}
+
+export function uploadAttachment(channelId: string, files: File[]) {
+  const formData = new FormData()
+  for (const file of files) {
+    formData.append("files", file)
+  }
+  return apiClient.post<AttachmentData[]>(`/channels/${channelId}/attachments`, formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  })
 }

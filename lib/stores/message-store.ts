@@ -1,12 +1,12 @@
 import { create } from "zustand"
-import { getMessages, sendMessage, type Message } from "@/lib/services/messages"
+import { getMessages, sendMessage, type Message, type AttachmentData } from "@/lib/services/messages"
 
 type MessageStore = {
   messagesByChannel: Record<string, Message[]>
   loading: boolean
   error: string | null
   fetchMessages: (channelId: string) => Promise<void>
-  sendAndRefresh: (channelId: string, content: string) => Promise<void>
+  sendAndRefresh: (channelId: string, content: string, attachments?: AttachmentData[]) => Promise<void>
 }
 
 export const useMessageStore = create<MessageStore>((set, get) => ({
@@ -24,8 +24,8 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
     }
   },
 
-  sendAndRefresh: async (channelId: string, content: string) => {
-    await sendMessage(channelId, content)
+  sendAndRefresh: async (channelId: string, content: string, attachments?: AttachmentData[]) => {
+    await sendMessage(channelId, content, attachments)
     await get().fetchMessages(channelId)
   },
 }))

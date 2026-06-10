@@ -1,29 +1,34 @@
 "use client"
 
-import { useMemo } from "react"
-import { FileText, Pen, Trash2 } from "lucide-react"
+import { FileText, Loader2, Pen, Trash2 } from "lucide-react"
+
 import { Button } from "@/components/ui/button"
+import type { AttachmentData } from "@/lib/services/messages"
 
 type FilePreviewProps = Readonly<{
-  file: File
+  fileName: string
+  fileType: string
+  loading: boolean
+  previewUrl: string | null
+  attachment: AttachmentData | null
   onRemove: () => void
+  onEdit: (attachment: AttachmentData) => void
 }>
 
-export default function FilePreview({ file, onRemove }: FilePreviewProps) {
-  const isImage = file.type.startsWith("image/")
-
-  const previewUrl = useMemo(() => {
-    if (isImage) return URL.createObjectURL(file)
-    return null
-  }, [file, isImage])
+export default function FilePreview({ fileName, fileType, loading, previewUrl, attachment, onRemove, onEdit }: FilePreviewProps) {
+  const isImage = fileType.startsWith("image/")
 
   return (
     <div className="relative w-fit rounded-lg border bg-muted/30">
       <div className="size-32">
-        {isImage && previewUrl ? (
+        {loading ? (
+          <div className="flex size-full items-center justify-center rounded-lg bg-muted">
+            <Loader2 className="size-8 animate-spin text-muted-foreground" />
+          </div>
+        ) : isImage && previewUrl ? (
           <img
             src={previewUrl}
-            alt={file.name}
+            alt={fileName}
             className="size-full rounded-lg object-cover"
           />
         ) : (
@@ -42,16 +47,17 @@ export default function FilePreview({ file, onRemove }: FilePreviewProps) {
         >
           <Trash2 className="size-4" />
         </Button>
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          className="size-5 rounded-full bg-background shadow hover:bg-muted"
-          disabled
-        >
-          <Pen className="size-3" />
-        </Button>
-
+        {attachment && (
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className="size-5 rounded-full bg-background shadow hover:bg-muted"
+            onClick={() => onEdit(attachment)}
+          >
+            <Pen className="size-3" />
+          </Button>
+        )}
       </div>
     </div>
   )

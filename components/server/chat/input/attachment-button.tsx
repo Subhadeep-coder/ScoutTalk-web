@@ -6,23 +6,23 @@ import { Paperclip } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 type AttachmentButtonProps = Readonly<{
-  onFileSelect: (file: File) => void
+  onFilesSelect: (files: File[]) => void
 }>
 
-export default function AttachmentButton({ onFileSelect }: AttachmentButtonProps) {
+export default function AttachmentButton({ onFilesSelect }: AttachmentButtonProps) {
   const inputRef = useRef<HTMLInputElement>(null)
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0]
-    if (file) {
-      onFileSelect(file)
+    const files = e.target.files
+    if (files && files.length > 0) {
+      onFilesSelect(Array.from(files))
       if (inputRef.current) inputRef.current.value = ""
     }
   }
 
   return (
     <label>
-      <input ref={inputRef} type="file" className="hidden" onChange={handleChange} />
+      <input ref={inputRef} type="file" multiple className="hidden" onChange={handleChange} />
       <Button
         type="button"
         variant="ghost"

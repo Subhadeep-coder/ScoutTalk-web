@@ -14,7 +14,7 @@ export default function AuthenticatedLayout({
   return (
     <SidebarProvider defaultOpen={false} onOpenChange={() => {}}>
       <AppSidebar />
-      <SidebarInset>{children}</SidebarInset>
+      <SidebarInset className="max-h-dvh">{children}</SidebarInset>
     </SidebarProvider>
   )
 }
