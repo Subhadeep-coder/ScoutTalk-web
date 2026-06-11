@@ -23,6 +23,7 @@ export type Message = {
   parentId: string | null
   content: string | null
   attachments: AttachmentData[] | null
+  isEdited: boolean
   createdAt: string
   updatedAt: string
   author: MessageAuthor
@@ -43,12 +44,16 @@ export function sendMessage(channelId: string, content: string | null, attachmen
   return apiClient.post(`/channels/${channelId}/messages`, body)
 }
 
-export function deleteMessage(channelId: string, messageId: string) {
-  return apiClient.delete(`/channels/${channelId}/messages/${messageId}`)
+export function updateMessage(messageId: string, content: string) {
+  return apiClient.patch<Message>(`/messages/${messageId}`, { content })
 }
 
-export function deleteAttachment(channelId: string, messageId: string, url: string) {
-  return apiClient.delete(`/channels/${channelId}/messages/${messageId}/attachments`, {
+export function deleteMessage(messageId: string) {
+  return apiClient.delete(`/messages/${messageId}`)
+}
+
+export function deleteAttachment(messageId: string, url: string) {
+  return apiClient.delete(`/messages/${messageId}/attachments`, {
     data: { url },
   })
 }

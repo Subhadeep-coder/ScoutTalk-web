@@ -31,9 +31,10 @@ type MessageActionsProps = Readonly<{
   authorId: string
   authorName: string
   content: string | null
+  onEdit?: () => void
 }>
 
-export default function MessageActions({ channelId, messageId, authorId, authorName, content }: MessageActionsProps) {
+export default function MessageActions({ channelId, messageId, authorId, authorName, content, onEdit }: MessageActionsProps) {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const currentUser = useAuthStore((s) => s.user)
   const setReplyTo = useReplyStore((s) => s.setReplyTo)
@@ -50,7 +51,7 @@ export default function MessageActions({ channelId, messageId, authorId, authorN
         </TooltipWrapper>
         {isMine && content && (
           <TooltipWrapper label="Edit" side="top">
-            <Button variant="ghost" size="icon-sm">
+            <Button variant="ghost" size="icon-sm" onClick={onEdit}>
               <Pencil />
             </Button>
           </TooltipWrapper>
@@ -67,7 +68,7 @@ export default function MessageActions({ channelId, messageId, authorId, authorN
               Reply
             </DropdownMenuItem>
             {isMine && content && (
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={onEdit}>
                 <Pencil />
                 Edit
               </DropdownMenuItem>
@@ -97,7 +98,7 @@ export default function MessageActions({ channelId, messageId, authorId, authorN
               variant="destructive"
               onClick={async () => {
                 try {
-                  await deleteMessage(channelId, messageId)
+                  await deleteMessage(messageId)
                   toast.success("Message deleted")
                   fetchMessages(channelId)
                 } catch {
