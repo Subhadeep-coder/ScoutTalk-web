@@ -6,7 +6,7 @@ type MessageStore = {
   loading: boolean
   error: string | null
   fetchMessages: (channelId: string) => Promise<void>
-  sendAndRefresh: (channelId: string, content: string, attachments?: AttachmentData[]) => Promise<void>
+  sendAndRefresh: (channelId: string, content: string, attachments?: AttachmentData[], parentId?: string) => Promise<void>
 }
 
 export const useMessageStore = create<MessageStore>((set, get) => ({
@@ -24,8 +24,8 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
     }
   },
 
-  sendAndRefresh: async (channelId: string, content: string, attachments?: AttachmentData[]) => {
-    await sendMessage(channelId, content, attachments)
+  sendAndRefresh: async (channelId: string, content: string, attachments?: AttachmentData[], parentId?: string) => {
+    await sendMessage(channelId, content, attachments, parentId)
     await get().fetchMessages(channelId)
   },
 }))

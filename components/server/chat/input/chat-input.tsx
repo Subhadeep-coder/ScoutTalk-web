@@ -9,9 +9,11 @@ import EmojiButton from "./emoji-button"
 import FilePreview from "./file-preview"
 import GifButton from "./gif-button"
 import MessageInput from "./message-input"
+import ReplyBar from "./reply-bar"
 import SendButton from "./send-button"
 import { uploadAttachment, type AttachmentData } from "@/lib/services/messages"
 import { useMessageStore } from "@/lib/stores/message-store"
+import { useReplyStore } from "@/lib/stores/reply-store"
 
 type ChatInputProps = Readonly<{
   channelName: string
@@ -24,6 +26,8 @@ export default function ChatInput({ channelName, channelId }: ChatInputProps) {
   const [uploading, setUploading] = useState(false)
   const [attachments, setAttachments] = useState<AttachmentData[]>([])
   const [editAttachment, setEditAttachment] = useState<AttachmentData | null>(null)
+  const replyTo = useReplyStore((s) => s.replyTo)
+  const clearReply = useReplyStore((s) => s.clearReply)
   const sendAndRefresh = useMessageStore((s) => s.sendAndRefresh)
   const loading = useMessageStore((s) => s.loading)
 
@@ -62,10 +66,11 @@ export default function ChatInput({ channelName, channelId }: ChatInputProps) {
     if (!trimmed && attachments.length === 0) return
 
     try {
-      await sendAndRefresh(channelId, trimmed, attachments.length > 0 ? attachments : undefined)
+      await sendAndRefresh(channelId, trimmed, attachments.length > 0 ? attachments : undefined, replyTo?.messageId)
       setMessage("")
       setSelectedFiles([])
       setAttachments([])
+      clearReply()
     } catch {
       toast.error("Failed to send message")
     }
@@ -73,6 +78,7 @@ export default function ChatInput({ channelName, channelId }: ChatInputProps) {
 
   return (
     <div className="border-t p-4">
+      <ReplyBar />
       <div className="flex flex-col gap-2 rounded-lg border bg-muted/50 px-3 py-1.5">
         {selectedFiles.length > 0 && (
           <div className="flex flex-wrap gap-2">

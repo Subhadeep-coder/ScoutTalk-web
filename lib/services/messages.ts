@@ -32,11 +32,25 @@ export function getMessages(channelId: string) {
   return apiClient.get<Message[]>(`/channels/${channelId}/messages`)
 }
 
-export function sendMessage(channelId: string, content: string, attachments?: AttachmentData[]) {
+export function sendMessage(channelId: string, content: string | null, attachments?: AttachmentData[], parentId?: string) {
+  if (!content && (!attachments || attachments.length === 0)) {
+    throw new Error("Message must have content or attachments")
+  }
   const body: Record<string, unknown> = {}
   if (content) body.content = content
   if (attachments && attachments.length > 0) body.attachments = attachments
+  if (parentId) body.parentId = parentId
   return apiClient.post(`/channels/${channelId}/messages`, body)
+}
+
+export function deleteMessage(channelId: string, messageId: string) {
+  return apiClient.delete(`/channels/${channelId}/messages/${messageId}`)
+}
+
+export function deleteAttachment(channelId: string, messageId: string, url: string) {
+  return apiClient.delete(`/channels/${channelId}/messages/${messageId}/attachments`, {
+    data: { url },
+  })
 }
 
 export function uploadAttachment(channelId: string, files: File[]) {
