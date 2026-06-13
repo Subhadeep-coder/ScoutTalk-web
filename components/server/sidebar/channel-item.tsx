@@ -1,6 +1,6 @@
 "use client"
 
-import { Hash, Volume2 } from "lucide-react"
+import { Hash, Settings, Volume2 } from "lucide-react"
 import Link from "next/link"
 
 import { cn } from "@/lib/utils"
@@ -20,7 +20,7 @@ export function ChannelItem({ id, name, type, serverId, isActive }: ChannelItemP
     <Link
       href={`/server/${serverId}/${id}`}
       className={cn(
-        "flex items-center gap-2 rounded-md px-2 py-1.5 text-base transition-colors",
+        "group flex items-center gap-2 rounded-md px-2 py-1.5 text-base transition-colors",
         isActive
           ? "bg-accent text-accent-foreground"
           : "text-muted-foreground hover:bg-muted hover:text-foreground",
@@ -28,6 +28,22 @@ export function ChannelItem({ id, name, type, serverId, isActive }: ChannelItemP
     >
       <Icon className="size-5 shrink-0" />
       <span className="truncate">{name}</span>
+      <span
+        role="button"
+        tabIndex={0}
+        onClick={(e) => {
+          e.stopPropagation()
+          // TODO: open channel settings
+        }}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.stopPropagation()
+          }
+        }}
+        className="ml-auto cursor-pointer opacity-0 transition-opacity group-hover:opacity-100 hover:text-foreground"
+      >
+        <Settings className="size-4" />
+      </span>
     </Link>
   )
 }

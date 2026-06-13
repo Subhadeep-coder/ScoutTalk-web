@@ -24,9 +24,10 @@ type CategorySectionProps = Readonly<{
   channels: Channel[]
   serverId: string
   activeChannelId: string
+  onChannelCreated?: () => void
 }>
 
-export function CategorySection({ category, channels, serverId, activeChannelId }: CategorySectionProps) {
+export function CategorySection({ category, channels, serverId, activeChannelId, onChannelCreated }: CategorySectionProps) {
   const sortedChannels = [...channels]
     .filter((c) => c.categoryId === category.id)
     .sort((a, b) => a.position - b.position)
@@ -37,22 +38,24 @@ export function CategorySection({ category, channels, serverId, activeChannelId 
         <span className="text-sm font-semibold text-muted-foreground">
           {category.name}
         </span>
-        <CreateChannelDialog categoryName={category.name}>
+        <CreateChannelDialog categoryName={category.name} categoryId={category.id} serverId={serverId} onCreated={onChannelCreated}>
           <span className="ml-auto flex size-5 cursor-pointer items-center justify-center text-muted-foreground hover:text-foreground">
             <Plus className="size-4" />
           </span>
         </CreateChannelDialog>
       </div>
-      {sortedChannels.map((channel) => (
-        <ChannelItem
-          key={channel.id}
-          id={channel.id}
-          name={channel.name}
-          type={channel.type}
-          serverId={serverId}
-          isActive={channel.id === activeChannelId}
-        />
-      ))}
+      <div className="flex flex-col gap-1">
+        {sortedChannels.map((channel) => (
+          <ChannelItem
+            key={channel.id}
+            id={channel.id}
+            name={channel.name}
+            type={channel.type}
+            serverId={serverId}
+            isActive={channel.id === activeChannelId}
+          />
+        ))}
+      </div>
     </div>
   )
 }

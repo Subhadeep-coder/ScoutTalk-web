@@ -24,7 +24,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const [serverRefreshKey, setServerRefreshKey] = useState(0)
 
   return (
-    <Sidebar collapsible="icon" style={{ "--sidebar-width-icon": "3.5rem" } as React.CSSProperties} {...props}>
+    <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem className="flex justify-center">

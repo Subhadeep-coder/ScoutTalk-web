@@ -1,7 +1,8 @@
 "use client"
 
 import { useState, type ReactNode } from "react"
-import { Hash, Volume2, Smile } from "lucide-react"
+import { Hash, Volume2, Smile, Loader2 } from "lucide-react"
+import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -22,26 +23,48 @@ import {
 } from "@/components/ui/popover"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { EmojiPicker } from "@/components/server/emoji-picker"
+import { createChannel } from "@/lib/services/channels"
 
 type CreateChannelDialogProps = Readonly<{
   children: ReactNode
   categoryName: string
+  categoryId: string
+  serverId: string
+  onCreated?: () => void
 }>
 
-export function CreateChannelDialog({ children, categoryName }: CreateChannelDialogProps) {
+export function CreateChannelDialog({ children, categoryName, categoryId, serverId, onCreated }: CreateChannelDialogProps) {
   const [open, setOpen] = useState(false)
   const [channelType, setChannelType] = useState<"TEXT" | "VOICE">("TEXT")
   const [name, setName] = useState("")
   const [emojiOpen, setEmojiOpen] = useState(false)
+  const [creating, setCreating] = useState(false)
 
   function handleEmojiSelect(emoji: string) {
     setName((prev) => prev + emoji)
     setEmojiOpen(false)
   }
 
-  function handleCreate() {
-    if (!name.trim()) return
-    setOpen(false)
+  async function handleCreate() {
+    if (!name.trim() || creating) return
+    setCreating(true)
+    try {
+      await createChannel({
+        name: name.trim().toLowerCase().replace(/\s+/g, "-"),
+        serverId,
+        categoryId,
+        type: channelType,
+      })
+      onCreated?.()
+      toast.success("Channel created")
+    } catch {
+      toast.error("Failed to create channel")
+    } finally {
+      setChannelType("TEXT")
+      setName("")
+      setOpen(false)
+      setCreating(false)
+    }
   }
 
   function handleOpenChange(open: boolean) {
@@ -95,7 +118,7 @@ export function CreateChannelDialog({ children, categoryName }: CreateChannelDia
               <Input
                 placeholder="new-channel"
                 value={name}
-                onChange={(e) => setName(e.target.value)}
+                onChange={(e) => setName(e.target.value.toLowerCase())}
                 className="pl-9"
               />
               <Popover open={emojiOpen} onOpenChange={setEmojiOpen}>
@@ -123,8 +146,8 @@ export function CreateChannelDialog({ children, categoryName }: CreateChannelDia
           <Button variant="outline" onClick={() => handleOpenChange(false)}>
             Cancel
           </Button>
-          <Button onClick={handleCreate} disabled={!name.trim()}>
-            Create Channel
+          <Button onClick={handleCreate} disabled={!name.trim() || creating}>
+            {creating ? <Loader2 className="size-4 animate-spin" /> : "Create Channel"}
           </Button>
         </DialogFooter>
       </DialogContent>

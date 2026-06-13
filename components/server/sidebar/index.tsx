@@ -24,9 +24,10 @@ type ServerSidebarProps = Readonly<{
   serverName: string
   categories: Category[]
   channels: Channel[]
+  onChannelCreated?: () => void
 }>
 
-export function ServerSidebar({ serverId, activeChannelId, serverName, categories, channels }: ServerSidebarProps) {
+export function ServerSidebar({ serverId, activeChannelId, serverName, categories, channels, onChannelCreated }: ServerSidebarProps) {
   const sortedCategories = [...categories].sort((a, b) => a.position - b.position)
 
   return (
@@ -40,6 +41,7 @@ export function ServerSidebar({ serverId, activeChannelId, serverName, categorie
             channels={channels}
             serverId={serverId}
             activeChannelId={activeChannelId}
+            onChannelCreated={onChannelCreated}
           />
         ))}
       </ScrollArea>

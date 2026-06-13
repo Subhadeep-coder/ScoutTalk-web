@@ -25,6 +25,10 @@ export function ServerPageContent({ serverId, channelId }: ServerPageContentProp
     }
   }, [serverId, setActiveServerId, activeServer, setActiveServer])
 
+  function refetchServer() {
+    getServer(serverId).then(({ data }) => setActiveServer(data)).catch(() => {})
+  }
+
   if (!activeServer || activeServer.id !== serverId) {
     return (
       <div className="flex h-full items-center justify-center text-muted-foreground">
@@ -44,6 +48,7 @@ export function ServerPageContent({ serverId, channelId }: ServerPageContentProp
           serverName={activeServer.name}
           categories={activeServer.categories}
           channels={activeServer.channels}
+          onChannelCreated={refetchServer}
         />
         <main className="flex flex-1 items-center justify-center text-muted-foreground">
           Channel not found
@@ -62,6 +67,7 @@ export function ServerPageContent({ serverId, channelId }: ServerPageContentProp
         serverName={activeServer.name}
         categories={activeServer.categories}
         channels={activeServer.channels}
+        onChannelCreated={refetchServer}
       />
       {isVoice ? (
         <main className="flex flex-1 items-center justify-center text-muted-foreground">
