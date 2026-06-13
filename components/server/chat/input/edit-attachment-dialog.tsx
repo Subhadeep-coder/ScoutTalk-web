@@ -1,29 +1,30 @@
 "use client"
 
-import { useState } from "react"
+import { useState, type ReactNode } from "react"
 
 import { Button } from "@/components/ui/button"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import type { AttachmentData } from "@/lib/services/messages"
 
 type EditAttachmentDialogProps = Readonly<{
+  children: ReactNode
   attachment: AttachmentData
-  open: boolean
-  onOpenChange: (open: boolean) => void
   onSave: (updated: AttachmentData) => void
 }>
 
-export default function EditAttachmentDialog({ attachment, open, onOpenChange, onSave }: EditAttachmentDialogProps) {
+export default function EditAttachmentDialog({ children, attachment, onSave }: EditAttachmentDialogProps) {
+  const [open, setOpen] = useState(false)
   const [name, setName] = useState(attachment.name)
 
   function handleSave() {
     onSave({ ...attachment, name })
-    onOpenChange(false)
+    setOpen(false)
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>{name}</DialogTitle>

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef } from "react"
+import { useRef, useState } from "react"
 import Image from "next/image"
 import { Trash2 } from "lucide-react"
 import { toast } from "sonner"
@@ -8,11 +8,13 @@ import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
+  DialogTrigger,
 } from "@/components/ui/dialog"
 import type { Message } from "@/lib/services/messages"
 import { deleteAttachment, updateMessage } from "@/lib/services/messages"
@@ -30,8 +32,6 @@ type MessageBubbleProps = Readonly<{
 
 export default function MessageBubble({ message }: MessageBubbleProps) {
   const { author } = message
-  const [preview, setPreview] = useState<{ url: string; name: string } | null>(null)
-  const [deleteTarget, setDeleteTarget] = useState<string | null>(null)
   const [isEditing, setIsEditing] = useState(false)
   const [editText, setEditText] = useState(message.content ?? "")
   const inputRef = useRef<HTMLInputElement>(null)
@@ -113,28 +113,58 @@ export default function MessageBubble({ message }: MessageBubbleProps) {
                   key={i}
                   className={`group/image relative overflow-hidden rounded-lg ${attachments.length === 3 && i === 0 ? "row-span-2" : "aspect-square"}`}
                 >
-                  <button
-                    type="button"
-                    className="size-full"
-                    onClick={() => setPreview({ url: att.url, name: att.name })}
-                  >
-                    <Image
-                      src={att.url}
-                      alt={att.name}
-                      width={400}
-                      height={400}
-                      unoptimized
-                      className="size-full cursor-pointer object-cover transition-opacity group-hover/image:opacity-80"
-                    />
-                  </button>
-                  <Button
-                    variant="ghost"
-                    size="icon-sm"
-                    className="absolute right-1 top-1 z-10 text-destructive opacity-0 transition-opacity hover:scale-110 hover:text-destructive group-hover/image:opacity-100"
-                    onClick={() => setDeleteTarget(att.url)}
-                  >
-                    <Trash2 />
-                  </Button>
+                  <ImagePreviewDialog url={att.url} name={att.name}>
+                    <button type="button" className="size-full">
+                      <Image
+                        src={att.url}
+                        alt={att.name}
+                        width={400}
+                        height={400}
+                        unoptimized
+                        className="size-full cursor-pointer object-cover transition-opacity group-hover/image:opacity-80"
+                      />
+                    </button>
+                  </ImagePreviewDialog>
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon-sm"
+                        className="absolute right-1 top-1 z-10 text-destructive opacity-0 transition-opacity hover:scale-110 hover:text-destructive group-hover/image:opacity-100"
+                      >
+                        <Trash2 />
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Remove attachment</DialogTitle>
+                        <DialogDescription>
+                          Are you sure you want to remove this attachment?
+                        </DialogDescription>
+                      </DialogHeader>
+                      <DialogFooter>
+                        <DialogClose asChild>
+                          <Button variant="outline">Cancel</Button>
+                        </DialogClose>
+                        <DialogClose asChild>
+                          <Button
+                            variant="destructive"
+                            onClick={async () => {
+                              try {
+                                await deleteAttachment(message.id, att.url)
+                                toast.success("Attachment removed")
+                                fetchMessages(message.channelId)
+                              } catch {
+                                toast.error("Failed to remove attachment")
+                              }
+                            }}
+                          >
+                            Remove
+                          </Button>
+                        </DialogClose>
+                      </DialogFooter>
+                    </DialogContent>
+                  </Dialog>
                 </div>
               ))}
             </div>
@@ -155,43 +185,6 @@ export default function MessageBubble({ message }: MessageBubbleProps) {
           />
         )}
       </div>
-      <ImagePreviewDialog
-        url={preview?.url ?? null}
-        name={preview?.name ?? ""}
-        open={!!preview}
-        onOpenChange={(open) => { if (!open) setPreview(null) }}
-      />
-      <Dialog open={!!deleteTarget} onOpenChange={(open) => { if (!open) setDeleteTarget(null) }}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Remove attachment</DialogTitle>
-            <DialogDescription>
-              Are you sure you want to remove this attachment?
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setDeleteTarget(null)}>
-              Cancel
-            </Button>
-            <Button
-              variant="destructive"
-              onClick={async () => {
-                if (!deleteTarget) return
-                try {
-                  await deleteAttachment(message.id, deleteTarget)
-                  toast.success("Attachment removed")
-                  fetchMessages(message.channelId)
-                } catch {
-                  toast.error("Failed to remove attachment")
-                }
-                setDeleteTarget(null)
-              }}
-            >
-              Remove
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
   )
 }

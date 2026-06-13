@@ -3,6 +3,7 @@
 import { FileText, Loader2, Pen, Trash2 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
+import EditAttachmentDialog from "./edit-attachment-dialog"
 import type { AttachmentData } from "@/lib/services/messages"
 
 type FilePreviewProps = Readonly<{
@@ -12,10 +13,10 @@ type FilePreviewProps = Readonly<{
   previewUrl: string | null
   attachment: AttachmentData | null
   onRemove: () => void
-  onEdit: (attachment: AttachmentData) => void
+  onSave: (updated: AttachmentData) => void
 }>
 
-export default function FilePreview({ fileName, fileType, loading, previewUrl, attachment, onRemove, onEdit }: FilePreviewProps) {
+export default function FilePreview({ fileName, fileType, loading, previewUrl, attachment, onRemove, onSave }: FilePreviewProps) {
   const isImage = fileType.startsWith("image/")
 
   return (
@@ -48,15 +49,16 @@ export default function FilePreview({ fileName, fileType, loading, previewUrl, a
           <Trash2 className="size-4" />
         </Button>
         {attachment && (
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            className="size-5 rounded-full bg-background shadow hover:bg-muted"
-            onClick={() => onEdit(attachment)}
-          >
-            <Pen className="size-3" />
-          </Button>
+          <EditAttachmentDialog attachment={attachment} onSave={onSave}>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="size-5 rounded-full bg-background shadow hover:bg-muted"
+            >
+              <Pen className="size-3" />
+            </Button>
+          </EditAttachmentDialog>
         )}
       </div>
     </div>

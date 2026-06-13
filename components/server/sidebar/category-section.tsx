@@ -2,8 +2,8 @@
 
 import { Plus } from "lucide-react"
 
-import { Button } from "@/components/ui/button"
 import { ChannelItem } from "@/components/server/sidebar/channel-item"
+import { CreateChannelDialog } from "@/components/server/sidebar/create-channel-dialog"
 
 type Category = {
   id: string
@@ -31,22 +31,17 @@ export function CategorySection({ category, channels, serverId, activeChannelId 
     .filter((c) => c.categoryId === category.id)
     .sort((a, b) => a.position - b.position)
 
-  if (sortedChannels.length === 0) return null
-
   return (
     <div className="mb-4">
       <div className="mb-1 flex items-center px-2">
         <span className="text-xs font-semibold text-muted-foreground">
           {category.name}
         </span>
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          className="ml-auto size-4 text-muted-foreground hover:text-foreground"
-        >
-          <Plus className="size-3" />
-        </Button>
+        <CreateChannelDialog categoryName={category.name}>
+          <span className="ml-auto flex size-4 cursor-pointer items-center justify-center text-muted-foreground hover:text-foreground">
+            <Plus className="size-3" />
+          </span>
+        </CreateChannelDialog>
       </div>
       {sortedChannels.map((channel) => (
         <ChannelItem

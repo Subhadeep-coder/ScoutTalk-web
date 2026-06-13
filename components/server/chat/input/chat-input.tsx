@@ -4,7 +4,6 @@ import { useState } from "react"
 import { toast } from "sonner"
 
 import AttachmentButton from "./attachment-button"
-import EditAttachmentDialog from "./edit-attachment-dialog"
 import EmojiButton from "./emoji-button"
 import FilePreview from "./file-preview"
 import GifButton from "./gif-button"
@@ -25,7 +24,6 @@ export default function ChatInput({ channelName, channelId }: ChatInputProps) {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([])
   const [uploading, setUploading] = useState(false)
   const [attachments, setAttachments] = useState<AttachmentData[]>([])
-  const [editAttachment, setEditAttachment] = useState<AttachmentData | null>(null)
   const replyTo = useReplyStore((s) => s.replyTo)
   const clearReply = useReplyStore((s) => s.clearReply)
   const sendAndRefresh = useMessageStore((s) => s.sendAndRefresh)
@@ -50,10 +48,6 @@ export default function ChatInput({ channelName, channelId }: ChatInputProps) {
   function handleRemoveFile(index: number) {
     setSelectedFiles((prev) => prev.filter((_, i) => i !== index))
     setAttachments((prev) => prev.filter((_, i) => i !== index))
-  }
-
-  function handleEditAttachment(attachment: AttachmentData) {
-    setEditAttachment(attachment)
   }
 
   function handleSaveAttachment(updated: AttachmentData) {
@@ -91,7 +85,7 @@ export default function ChatInput({ channelName, channelId }: ChatInputProps) {
                 previewUrl={attachments[i]?.url ?? null}
                 attachment={attachments[i] ?? null}
                 onRemove={() => handleRemoveFile(i)}
-                onEdit={handleEditAttachment}
+                onSave={handleSaveAttachment}
               />
             ))}
           </div>
@@ -109,14 +103,6 @@ export default function ChatInput({ channelName, channelId }: ChatInputProps) {
           <SendButton onSend={handleSend} disabled={sending || (!message.trim() && attachments.length === 0)} />
         </div>
       </div>
-      {editAttachment && (
-        <EditAttachmentDialog
-          attachment={editAttachment}
-          open={!!editAttachment}
-          onOpenChange={(open) => { if (!open) setEditAttachment(null) }}
-          onSave={handleSaveAttachment}
-        />
-      )}
     </div>
   )
 }
