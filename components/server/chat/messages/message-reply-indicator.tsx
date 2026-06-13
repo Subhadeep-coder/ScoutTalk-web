@@ -1,20 +1,16 @@
 "use client"
 
-import { useCallback, useMemo } from "react"
+import { useCallback } from "react"
 import { Reply } from "lucide-react"
 
-import { useMessageStore } from "@/lib/stores/message-store"
+import type { ParentMessage } from "@/lib/services/messages"
 
 type MessageReplyIndicatorProps = Readonly<{
   parentId: string
-  channelId: string
+  parent: ParentMessage | null
 }>
 
-export default function MessageReplyIndicator({ parentId, channelId }: MessageReplyIndicatorProps) {
-  const messages = useMessageStore((s) => s.messagesByChannel[channelId])
-
-  const parent = useMemo(() => messages?.find((m) => m.id === parentId), [messages, parentId])
-
+export default function MessageReplyIndicator({ parentId, parent }: MessageReplyIndicatorProps) {
   const handleClick = useCallback(() => {
     const el = document.getElementById(`message-${parentId}`)
     if (el) {
@@ -26,9 +22,17 @@ export default function MessageReplyIndicator({ parentId, channelId }: MessageRe
     }
   }, [parentId])
 
-  if (!parent) return null
+  if (!parent) {
+    return (
+      <button type="button" className="mb-1 flex items-center gap-1.5 text-xs text-muted-foreground text-left cursor-pointer hover:text-foreground" onClick={handleClick}>
+        <Reply className="size-3 shrink-0" />
+        <span className="italic">Original message was deleted</span>
+      </button>
+    )
+  }
 
-  const parentName = parent.author.displayName || `${parent.author.firstName} ${parent.author.lastName}`
+  const author = parent.author
+  const parentName = author?.displayName ?? "Unknown"
   const preview = parent.content ?? "Attachment"
 
   return (

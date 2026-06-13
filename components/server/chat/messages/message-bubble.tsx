@@ -80,7 +80,7 @@ export default function MessageBubble({ message }: MessageBubbleProps) {
           <>
             <div />
             <div className="mb-0.5">
-              <MessageReplyIndicator parentId={message.parentId} channelId={message.channelId} />
+              <MessageReplyIndicator parentId={message.parentId} parent={message.parent} />
             </div>
           </>
         )}

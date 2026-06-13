@@ -15,12 +15,27 @@ export type AttachmentData = {
   name: string
 }
 
+export type ParentMessageAuthor = {
+  id: string
+  displayName: string | null
+  avatar: string | null
+}
+
+export type ParentMessage = {
+  id: string
+  authorId: string
+  content: string | null
+  attachments: AttachmentData[] | null
+  author: ParentMessageAuthor | null
+}
+
 export type Message = {
   id: string
   authorId: string
   channelId: string
   serverId: string
   parentId: string | null
+  parent: ParentMessage | null
   content: string | null
   attachments: AttachmentData[] | null
   isEdited: boolean
