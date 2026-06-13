@@ -32,14 +32,14 @@ export function CategorySection({ category, channels, serverId, activeChannelId 
     .sort((a, b) => a.position - b.position)
 
   return (
-    <div className="mb-4">
+    <div className="mb-5">
       <div className="mb-1 flex items-center px-2">
-        <span className="text-xs font-semibold text-muted-foreground">
+        <span className="text-sm font-semibold text-muted-foreground">
           {category.name}
         </span>
         <CreateChannelDialog categoryName={category.name}>
-          <span className="ml-auto flex size-4 cursor-pointer items-center justify-center text-muted-foreground hover:text-foreground">
-            <Plus className="size-3" />
+          <span className="ml-auto flex size-5 cursor-pointer items-center justify-center text-muted-foreground hover:text-foreground">
+            <Plus className="size-4" />
           </span>
         </CreateChannelDialog>
       </div>

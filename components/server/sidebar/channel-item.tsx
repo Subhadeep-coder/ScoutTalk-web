@@ -20,13 +20,13 @@ export function ChannelItem({ id, name, type, serverId, isActive }: ChannelItemP
     <Link
       href={`/server/${serverId}/${id}`}
       className={cn(
-        "flex items-center gap-2 rounded-md px-2 py-1 text-sm transition-colors",
+        "flex items-center gap-2 rounded-md px-2 py-1.5 text-base transition-colors",
         isActive
           ? "bg-accent text-accent-foreground"
           : "text-muted-foreground hover:bg-muted hover:text-foreground",
       )}
     >
-      <Icon className="size-4 shrink-0" />
+      <Icon className="size-5 shrink-0" />
       <span className="truncate">{name}</span>
     </Link>
   )

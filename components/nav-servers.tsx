@@ -41,15 +41,15 @@ export function NavServers() {
               <SidebarMenuItem key={server.id} className="flex justify-center">
                 <div
                   className={cn(
-                    "absolute -left-2 top-1/2 h-5 w-1 -translate-y-1/2 rounded-r-full transition-opacity",
+                    "absolute -left-2 top-1/2 h-6 w-1 -translate-y-1/2 rounded-r-full transition-opacity",
                     isActive ? "bg-white opacity-100" : "opacity-0",
                   )}
                 />
                 <SidebarMenuButton tooltip={server.name} className="justify-center" asChild>
                   <Link href={`/server/${server.id}`}>
-                    <Avatar className="size-8">
+                    <Avatar className="size-10">
                       {server.avatar && <AvatarImage src={server.avatar} />}
-                      <AvatarFallback className="bg-muted text-xs font-medium">
+                      <AvatarFallback className="bg-muted text-sm font-medium">
                         {server.name[0]}
                       </AvatarFallback>
                     </Avatar>

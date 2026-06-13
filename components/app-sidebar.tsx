@@ -24,13 +24,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const [serverRefreshKey, setServerRefreshKey] = useState(0)
 
   return (
-    <Sidebar collapsible="icon" {...props}>
+    <Sidebar collapsible="icon" style={{ "--sidebar-width-icon": "3.5rem" } as React.CSSProperties} {...props}>
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem className="flex justify-center">
             <SidebarMenuButton size="lg" className="justify-center" asChild>
               <Link href="/dashboard" onClick={() => useServerStore.getState().setActiveServerId(null)}>
-                <Users className="size-5" />
+                <Users className="size-6" />
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>

@@ -22,31 +22,31 @@ export function ServerHeader({ serverName }: ServerHeaderProps) {
       <DropdownMenuTrigger asChild>
         <Button
           variant="ghost"
-          className="group flex h-12 w-full shrink-0 items-center justify-between gap-2 border-b px-4 font-semibold"
+          className="group flex h-14 w-full shrink-0 items-center justify-between gap-2 border-b px-4 font-semibold text-base"
         >
           <span className="truncate">{serverName}</span>
-          <ChevronDown className="size-4 shrink-0 text-muted-foreground transition-transform group-data-[state=open]:rotate-180" />
+          <ChevronDown className="size-5 shrink-0 text-muted-foreground transition-transform group-data-[state=open]:rotate-180" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent side="bottom" align="center" sideOffset={4} className="w-56">
+      <DropdownMenuContent side="bottom" align="center" sideOffset={4} className="w-64">
         <DropdownMenuItem>
-          <UserPlus className="size-4" />
+          <UserPlus className="size-5" />
           Invite People
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <ServerSettingsDialog serverName={serverName}>
           <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-            <Settings className="size-4" />
+            <Settings className="size-5" />
             Server Settings
           </DropdownMenuItem>
         </ServerSettingsDialog>
         <DropdownMenuItem>
-          <Plus className="size-4" />
+          <Plus className="size-5" />
           Create Channel
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem variant="destructive">
-          <LogOut className="size-4" />
+          <LogOut className="size-5" />
           Leave Server
         </DropdownMenuItem>
       </DropdownMenuContent>

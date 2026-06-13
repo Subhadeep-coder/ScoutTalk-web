@@ -121,7 +121,7 @@ export function CreateServerDialog({ onCreated }: CreateServerDialogProps) {
       }}>
         <DialogTrigger asChild>
           <SidebarMenuButton tooltip="Add Server" className="justify-center">
-            <Plus className="size-5" />
+            <Plus className="size-6" />
           </SidebarMenuButton>
         </DialogTrigger>
         <DialogContent>

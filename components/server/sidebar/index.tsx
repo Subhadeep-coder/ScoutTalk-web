@@ -30,9 +30,9 @@ export function ServerSidebar({ serverId, activeChannelId, serverName, categorie
   const sortedCategories = [...categories].sort((a, b) => a.position - b.position)
 
   return (
-    <div className="flex h-full w-60 flex-col bg-muted/30">
+    <div className="flex h-full w-72 flex-col bg-muted/30">
       <ServerHeader serverName={serverName} />
-      <ScrollArea className="flex-1 px-2 py-2">
+      <ScrollArea className="flex-1 px-3 py-3">
         {sortedCategories.map((category) => (
           <CategorySection
             key={category.id}
