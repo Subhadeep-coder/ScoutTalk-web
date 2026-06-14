@@ -22,20 +22,47 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { EmojiPicker } from "@/components/server/emoji-picker"
 import { createChannel } from "@/lib/services/channels"
+
+type Category = {
+  id: string
+  name: string
+  position: number
+}
 
 type CreateChannelDialogProps = Readonly<{
   children: ReactNode
   categoryName: string
-  categoryId: string
+  categoryId?: string
   serverId: string
+  categories?: Category[]
   onCreated?: () => void
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
 }>
 
-export function CreateChannelDialog({ children, categoryName, categoryId, serverId, onCreated }: CreateChannelDialogProps) {
-  const [open, setOpen] = useState(false)
+export function CreateChannelDialog({ children, categoryName, categoryId, serverId, categories, onCreated, open: controlledOpen, onOpenChange: controlledOnOpenChange }: CreateChannelDialogProps) {
+  const [internalOpen, setInternalOpen] = useState(false)
+  const isControlled = controlledOpen !== undefined
+  const open = isControlled ? controlledOpen : internalOpen
+
+  function setOpen(value: boolean) {
+    if (isControlled) {
+      controlledOnOpenChange?.(value)
+    } else {
+      setInternalOpen(value)
+    }
+  }
   const [channelType, setChannelType] = useState<"TEXT" | "VOICE">("TEXT")
+  const [selectedCategoryId, setSelectedCategoryId] = useState(categories?.[0]?.id ?? "")
   const [name, setName] = useState("")
   const [emojiOpen, setEmojiOpen] = useState(false)
   const [creating, setCreating] = useState(false)
@@ -45,14 +72,24 @@ export function CreateChannelDialog({ children, categoryName, categoryId, server
     setEmojiOpen(false)
   }
 
+  function handleOpenChange(open: boolean) {
+    if (!open) {
+      setChannelType("TEXT")
+      setSelectedCategoryId(categories?.[0]?.id ?? "")
+      setName("")
+    }
+    setOpen(open)
+  }
+
   async function handleCreate() {
-    if (!name.trim() || creating) return
+    const targetCategoryId = categoryId || selectedCategoryId
+    if (!name.trim() || !targetCategoryId || creating) return
     setCreating(true)
     try {
       await createChannel({
         name: name.trim().toLowerCase().replace(/\s+/g, "-"),
         serverId,
-        categoryId,
+        categoryId: targetCategoryId,
         type: channelType,
       })
       onCreated?.()
@@ -61,18 +98,11 @@ export function CreateChannelDialog({ children, categoryName, categoryId, server
       toast.error("Failed to create channel")
     } finally {
       setChannelType("TEXT")
+      setSelectedCategoryId(categories?.[0]?.id ?? "")
       setName("")
       setOpen(false)
       setCreating(false)
     }
-  }
-
-  function handleOpenChange(open: boolean) {
-    if (!open) {
-      setChannelType("TEXT")
-      setName("")
-    }
-    setOpen(open)
   }
 
   return (
@@ -81,9 +111,24 @@ export function CreateChannelDialog({ children, categoryName, categoryId, server
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Create Channel</DialogTitle>
-          <DialogDescription>in {categoryName}</DialogDescription>
+          <DialogDescription>{categoryId ? `in ${categoryName}` : "Select a category to create a channel in"}</DialogDescription>
         </DialogHeader>
         <div className="flex flex-col gap-4">
+          {categories && (
+            <div className="flex flex-col gap-2">
+              <Label className="text-sm font-medium">Category</Label>
+              <Select value={selectedCategoryId} onValueChange={setSelectedCategoryId}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select a category" />
+                </SelectTrigger>
+                <SelectContent>
+                  {categories.map((cat) => (
+                    <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
           <div className="flex flex-col gap-3">
             <Label className="text-sm font-medium">Channel Type</Label>
             <RadioGroup value={channelType} onValueChange={(v) => setChannelType(v as "TEXT" | "VOICE")}>
@@ -118,7 +163,7 @@ export function CreateChannelDialog({ children, categoryName, categoryId, server
               <Input
                 placeholder="new-channel"
                 value={name}
-                onChange={(e) => setName(e.target.value.toLowerCase())}
+                onChange={(e) => setName(e.target.value.toLowerCase().replace(/(\S)\s+(\S)/g, (_, a, b) => `${a}-${b}`))}
                 className="pl-9"
               />
               <Popover open={emojiOpen} onOpenChange={setEmojiOpen}>

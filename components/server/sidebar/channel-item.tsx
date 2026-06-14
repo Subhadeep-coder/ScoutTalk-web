@@ -20,13 +20,13 @@ export function ChannelItem({ id, name, type, serverId, isActive }: ChannelItemP
     <Link
       href={`/server/${serverId}/${id}`}
       className={cn(
-        "group flex items-center gap-2 rounded-md px-2 py-1.5 text-base transition-colors",
+        "group grid grid-cols-[auto_1fr_auto] items-center gap-2 rounded-md px-2 py-1.5 text-base transition-colors",
         isActive
           ? "bg-accent text-accent-foreground"
           : "text-muted-foreground hover:bg-muted hover:text-foreground",
       )}
     >
-      <Icon className="size-5 shrink-0" />
+      <Icon className="size-5" />
       <span className="truncate">{name}</span>
       <span
         role="button"
@@ -40,7 +40,7 @@ export function ChannelItem({ id, name, type, serverId, isActive }: ChannelItemP
             e.stopPropagation()
           }
         }}
-        className="ml-auto cursor-pointer opacity-0 transition-opacity group-hover:opacity-100 hover:text-foreground"
+        className="ml-3 cursor-pointer opacity-0 transition-opacity group-hover:opacity-100 hover:text-foreground"
       >
         <Settings className="size-4" />
       </span>

@@ -32,7 +32,7 @@ export function ServerSidebar({ serverId, activeChannelId, serverName, categorie
 
   return (
     <div className="flex h-full w-72 flex-col bg-muted/30">
-      <ServerHeader serverName={serverName} />
+      <ServerHeader serverName={serverName} onCreated={onChannelCreated} />
       <ScrollArea className="flex-1 px-3 py-3">
         {sortedCategories.map((category) => (
           <CategorySection
