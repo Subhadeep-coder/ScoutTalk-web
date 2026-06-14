@@ -1,10 +1,10 @@
 "use client"
 
-import { useEffect, useState, type ReactNode } from "react"
+import { useEffect, useState } from "react"
 import { Trash2 } from "lucide-react"
 import { useRouter } from "next/navigation"
 
-import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog"
 import { SidebarInset, SidebarMenuButton } from "@/components/ui/sidebar"
 import { deleteChannel, updateChannel } from "@/lib/services/channels"
 import { useActiveServerStore } from "@/lib/stores/active-server-store"
@@ -15,39 +15,26 @@ import { DeleteChannelDialog } from "@/components/server/settings/channels/delet
 type Tab = "overview" | "permissions" | "invites"
 
 type ChannelSettingsDialogProps = Readonly<{
-  children: ReactNode
   channelId: string
   channelName: string
   channelType: "TEXT" | "VOICE"
   serverId: string
   onDeleted?: () => void
-  open?: boolean
-  onOpenChange?: (open: boolean) => void
+  open: boolean
+  onOpenChange: (open: boolean) => void
 }>
 
 export function ChannelSettingsDialog({
-  children,
   channelId,
   channelName,
   channelType,
   serverId,
   onDeleted,
-  open: controlledOpen,
-  onOpenChange: controlledOnOpenChange,
+  open,
+  onOpenChange,
 }: ChannelSettingsDialogProps) {
   const router = useRouter()
   const activeChannelId = useActiveServerStore((s) => s.activeChannelId)
-  const [internalOpen, setInternalOpen] = useState(false)
-  const isControlled = controlledOpen !== undefined
-  const open = isControlled ? controlledOpen : internalOpen
-
-  function setOpen(value: boolean) {
-    if (isControlled) {
-      controlledOnOpenChange?.(value)
-    } else {
-      setInternalOpen(value)
-    }
-  }
 
   const [tab, setTab] = useState<Tab>("overview")
   const [savedName, setSavedName] = useState(channelName)
@@ -89,7 +76,7 @@ export function ChannelSettingsDialog({
       const updatedChannels = activeServer.channels.filter((ch) => ch.id !== channelId)
       useActiveServerStore.getState().setActiveServer({ ...activeServer, channels: updatedChannels })
     }
-    setOpen(false)
+    onOpenChange(false)
     onDeleted?.()
     if (channelId === activeChannelId) {
       router.push(`/server/${serverId}`)
@@ -97,8 +84,7 @@ export function ChannelSettingsDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>{children}</DialogTrigger>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="flex h-[80vh] w-[80vw] !max-w-none gap-0 overflow-hidden p-0">
         <DialogTitle className="sr-only">{editedName} Settings</DialogTitle>
         <div onPointerDown={(e) => e.stopPropagation()} className="flex size-full">

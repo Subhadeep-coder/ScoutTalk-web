@@ -163,9 +163,7 @@ export function CategorySection({ category, channels, serverId, activeChannelId,
           open={true}
           onOpenChange={(o) => { if (!o) setSettingsChannelId(null) }}
           onDeleted={() => setSettingsChannelId(null)}
-        >
-          <div />
-        </ChannelSettingsDialog>
+        />
       )}
     </div>
   )

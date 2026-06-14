@@ -1,6 +1,5 @@
 "use client"
 
-import { useState } from "react"
 import { Bell, ChevronDown, FolderPlus, LogOut, Plus, Settings, UserPlus } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -13,7 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { CreateChannelDialog } from "@/components/server/sidebar/create-channel-dialog"
 import { CreateCategoryDialog } from "@/components/server/sidebar/create-category-dialog"
-import { ServerSettingsDialog } from "@/components/server/settings/server-settings-dialog"
+import { ServerSettingsDialog } from "@/components/server/settings/server/server-settings-dialog"
 import { useActiveServerStore } from "@/lib/stores/active-server-store"
 
 type ServerHeaderProps = Readonly<{
@@ -22,8 +21,6 @@ type ServerHeaderProps = Readonly<{
 }>
 
 export function ServerHeader({ serverName, onCreated }: ServerHeaderProps) {
-  const [createChannelOpen, setCreateChannelOpen] = useState(false)
-  const [createCategoryOpen, setCreateCategoryOpen] = useState(false)
   const activeServer = useActiveServerStore((s) => s.activeServer)
   const categories = activeServer?.categories ?? []
   const serverId = activeServer?.id ?? ""
@@ -45,14 +42,18 @@ export function ServerHeader({ serverName, onCreated }: ServerHeaderProps) {
             Invite People
           </DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={() => setCreateChannelOpen(true)}>
-            <Plus className="size-5" />
-            Create Channel
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => setCreateCategoryOpen(true)}>
-            <FolderPlus className="size-5" />
-            Create Category
-          </DropdownMenuItem>
+          <CreateChannelDialog categoryName="" serverId={serverId} categories={categories} onCreated={onCreated}>
+            <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+              <Plus className="size-5" />
+              Create Channel
+            </DropdownMenuItem>
+          </CreateChannelDialog>
+          <CreateCategoryDialog onCreated={onCreated}>
+            <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+              <FolderPlus className="size-5" />
+              Create Category
+            </DropdownMenuItem>
+          </CreateCategoryDialog>
           <DropdownMenuSeparator />
           <DropdownMenuItem>
             <Bell className="size-5" />
@@ -70,22 +71,6 @@ export function ServerHeader({ serverName, onCreated }: ServerHeaderProps) {
             Leave Server
           </DropdownMenuItem>
         </DropdownMenuContent>
-      </DropdownMenu>
-
-      <CreateChannelDialog
-        categoryName=""
-        serverId={serverId}
-        categories={categories}
-        open={createChannelOpen}
-        onOpenChange={setCreateChannelOpen}
-        onCreated={onCreated}
-      >
-        <div />
-      </CreateChannelDialog>
-
-      <CreateCategoryDialog open={createCategoryOpen} onOpenChange={setCreateCategoryOpen} onCreated={onCreated}>
-        <div />
-      </CreateCategoryDialog>
-    </>
-  )
+        </DropdownMenu>
+    </>)
 }
