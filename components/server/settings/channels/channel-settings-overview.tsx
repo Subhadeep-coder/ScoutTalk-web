@@ -30,7 +30,7 @@ export function ChannelSettingsOverview({
         <input
           type="text"
           value={editedName}
-          onChange={(e) => onNameChange(e.target.value)}
+          onChange={(e) => onNameChange(e.target.value.toLowerCase().replace(/(\S)\s+(\S)/g, (_, a, b) => `${a}-${b}`))}
           className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm transition-colors focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
         />
       </div>
