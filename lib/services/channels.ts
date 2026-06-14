@@ -8,3 +8,11 @@ export function createChannel(data: {
 }) {
   return apiClient.post("/channels", data)
 }
+
+export function reorderChannels(data: {
+  serverId: string
+  categoryId: string
+  order: string[]
+}) {
+  return apiClient.patch("/channels/reorder", data)
+}

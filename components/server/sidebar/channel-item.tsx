@@ -1,7 +1,7 @@
 "use client"
 
 import { Hash, Settings, Volume2 } from "lucide-react"
-import Link from "next/link"
+import { useRouter } from "next/navigation"
 
 import { cn } from "@/lib/utils"
 
@@ -14,13 +14,21 @@ type ChannelItemProps = Readonly<{
 }>
 
 export function ChannelItem({ id, name, type, serverId, isActive }: ChannelItemProps) {
+  const router = useRouter()
   const Icon = type === "TEXT" ? Hash : Volume2
 
   return (
-    <Link
-      href={`/server/${serverId}/${id}`}
+    <div
+      role="button"
+      tabIndex={0}
+      onClick={() => router.push(`/server/${serverId}/${id}`)}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          router.push(`/server/${serverId}/${id}`)
+        }
+      }}
       className={cn(
-        "group grid grid-cols-[auto_1fr_auto] items-center gap-2 rounded-md px-2 py-1.5 text-base transition-colors",
+        "group grid cursor-pointer grid-cols-[auto_1fr_auto] items-center gap-2 rounded-md px-2 py-1.5 text-base transition-colors",
         isActive
           ? "bg-accent text-accent-foreground"
           : "text-muted-foreground hover:bg-muted hover:text-foreground",
@@ -44,6 +52,6 @@ export function ChannelItem({ id, name, type, serverId, isActive }: ChannelItemP
       >
         <Settings className="size-4" />
       </span>
-    </Link>
+    </div>
   )
 }
