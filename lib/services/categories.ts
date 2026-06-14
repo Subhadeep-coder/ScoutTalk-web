@@ -9,7 +9,7 @@ export function createCategory(data: {
 
 export function reorderCategories(data: {
   serverId: string
-  categoryIds: string[]
+  order: string[]
 }) {
   return apiClient.patch("/categories/reorder", data)
 }
