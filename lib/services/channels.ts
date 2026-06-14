@@ -16,3 +16,11 @@ export function reorderChannels(data: {
 }) {
   return apiClient.patch("/channels/reorder", data)
 }
+
+export function deleteChannel(channelId: string) {
+  return apiClient.delete(`/channels/${channelId}`)
+}
+
+export function updateChannel(channelId: string, data: { name: string }) {
+  return apiClient.patch(`/channels/${channelId}`, data)
+}

@@ -19,6 +19,7 @@ import {
 
 import { SortableItem } from "@/components/server/sidebar/sortable-item"
 import { ChannelItem } from "@/components/server/sidebar/channel-item"
+import { ChannelSettingsDialog } from "@/components/server/settings/channels/channel-settings-dialog"
 import { CreateChannelDialog } from "@/components/server/sidebar/create-channel-dialog"
 import { useActiveServerStore } from "@/lib/stores/active-server-store"
 import { reorderChannels } from "@/lib/services/channels"
@@ -49,6 +50,7 @@ type CategorySectionProps = Readonly<{
 export function CategorySection({ category, channels, serverId, activeChannelId, onChannelCreated }: CategorySectionProps) {
   const [collapsed, setCollapsed] = useState(false)
   const [activeId, setActiveId] = useState<string | null>(null)
+  const [settingsChannelId, setSettingsChannelId] = useState<string | null>(null)
   const setActiveServer = useActiveServerStore((s) => s.setActiveServer)
   const activeServer = useActiveServerStore((s) => s.activeServer)
   const sensors = useSensors(
@@ -61,6 +63,10 @@ export function CategorySection({ category, channels, serverId, activeChannelId,
 
   const activeChannel = activeId
     ? sortedChannels.find((c) => c.id === activeId)
+    : null
+
+  const settingsChannel = settingsChannelId
+    ? sortedChannels.find((c) => c.id === settingsChannelId)
     : null
 
   function handleDragStart(event: DragStartEvent) {
@@ -129,6 +135,7 @@ export function CategorySection({ category, channels, serverId, activeChannelId,
                     type={channel.type}
                     serverId={serverId}
                     isActive={channel.id === activeChannelId}
+                    onSettingsClick={() => setSettingsChannelId(channel.id)}
                   />
                 </SortableItem>
               ))}
@@ -146,6 +153,19 @@ export function CategorySection({ category, channels, serverId, activeChannelId,
             ) : null}
           </DragOverlay>
         </DndContext>
+      )}
+      {settingsChannel && (
+        <ChannelSettingsDialog
+          channelId={settingsChannel.id}
+          channelName={settingsChannel.name}
+          channelType={settingsChannel.type}
+          serverId={serverId}
+          open={true}
+          onOpenChange={(o) => { if (!o) setSettingsChannelId(null) }}
+          onDeleted={() => setSettingsChannelId(null)}
+        >
+          <div />
+        </ChannelSettingsDialog>
       )}
     </div>
   )

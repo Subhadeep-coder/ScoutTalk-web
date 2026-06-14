@@ -17,13 +17,15 @@ export function ServerPageContent({ serverId, channelId }: ServerPageContentProp
   const activeServer = useActiveServerStore((s) => s.activeServer)
   const setActiveServer = useActiveServerStore((s) => s.setActiveServer)
   const setActiveServerId = useServerStore((s) => s.setActiveServerId)
+  const setActiveChannelId = useActiveServerStore((s) => s.setActiveChannelId)
 
   useEffect(() => {
     setActiveServerId(serverId)
+    setActiveChannelId(channelId)
     if (!activeServer || activeServer.id !== serverId) {
       getServer(serverId).then(({ data }) => setActiveServer(data)).catch(() => {})
     }
-  }, [serverId, setActiveServerId, activeServer, setActiveServer])
+  }, [serverId, channelId, setActiveServerId, setActiveChannelId, activeServer, setActiveServer])
 
   function refetchServer() {
     getServer(serverId).then(({ data }) => setActiveServer(data)).catch(() => {})
