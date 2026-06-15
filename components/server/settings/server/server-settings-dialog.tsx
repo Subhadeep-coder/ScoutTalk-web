@@ -5,6 +5,8 @@ import { useState, type ReactNode } from "react"
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { SidebarInset } from "@/components/ui/sidebar"
 import { ServerSettingsSidebar, type ServerSettingsTab } from "@/components/server/settings/server/server-settings-sidebar"
+import { ServerSettingsLayout } from "@/components/server/settings/server/server-settings-layout"
+import { tabMeta } from "@/components/server/settings/server/server-settings-tab-meta"
 import { ServerProfileContent } from "@/components/server/settings/server/server-profile-content"
 import { ServerTagContent } from "@/components/server/settings/server/server-tag-content"
 import { ServerEngagementContent } from "@/components/server/settings/server/server-engagement-content"
@@ -20,6 +22,27 @@ export function ServerSettingsDialog({ children, serverName }: ServerSettingsDia
   const [tab, setTab] = useState<ServerSettingsTab>("server-profile")
   const serverId = useActiveServerStore((s) => s.activeServer?.id)
 
+  const meta = tabMeta[tab]
+
+  function renderContent() {
+    switch (tab) {
+      case "server-profile":
+        return serverId ? <ServerProfileContent serverId={serverId} /> : null
+      case "server-tag":
+        return <ServerTagContent />
+      case "engagement":
+        return serverId ? <ServerEngagementContent serverId={serverId} /> : null
+      default:
+        return (
+          <div className="flex items-center justify-center py-20">
+            <div className="flex flex-col items-center gap-2 text-sm text-muted-foreground">
+              <p className="text-lg font-medium">Coming soon</p>
+            </div>
+          </div>
+        )
+    }
+  }
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
@@ -28,19 +51,9 @@ export function ServerSettingsDialog({ children, serverName }: ServerSettingsDia
         <div onPointerDown={(e) => e.stopPropagation()} className="flex size-full">
           <ServerSettingsSidebar serverName={serverName} tab={tab} onTabChange={setTab} />
           <SidebarInset className="flex flex-1 p-0">
-            {tab === "server-profile" && serverId ? (
-              <ServerProfileContent serverId={serverId} />
-            ) : tab === "server-tag" ? (
-              <ServerTagContent />
-            ) : tab === "engagement" && serverId ? (
-              <ServerEngagementContent serverId={serverId} />
-            ) : (
-              <div className="flex size-full items-center justify-center">
-                <div className="flex flex-col items-center gap-2 text-sm text-muted-foreground">
-                  <p className="text-lg font-medium">Coming soon</p>
-                </div>
-              </div>
-            )}
+            <ServerSettingsLayout title={meta.title} description={meta.description}>
+              {renderContent()}
+            </ServerSettingsLayout>
           </SidebarInset>
         </div>
       </DialogContent>

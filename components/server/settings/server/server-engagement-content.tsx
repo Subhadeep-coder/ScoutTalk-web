@@ -25,7 +25,6 @@ import {
   updateWelcomeMessage,
   deleteWelcomeMessage,
 } from "@/lib/services/servers"
-import { ServerSettingsLayout } from "@/components/server/settings/server/server-settings-layout"
 
 type ServerEngagementContentProps = Readonly<{
   serverId: string
@@ -101,22 +100,6 @@ export function ServerEngagementContent({ serverId }: ServerEngagementContentPro
     return () => { mounted = false }
   }, [serverId])
 
-  async function reload() {
-    setLoading(true)
-    try {
-      const [settingsRes, messagesRes] = await Promise.all([
-        getServerSettings(serverId),
-        getWelcomeMessages(serverId),
-      ])
-      setConfig(settingsRes.data ?? defaultConfig)
-      setOriginalConfig(settingsRes.data ?? defaultConfig)
-      setWelcomeMessages(messagesRes.data ?? [])
-    } catch {
-    } finally {
-      setLoading(false)
-    }
-  }
-
   async function saveSettings() {
     setSaving(true)
     try {
@@ -189,10 +172,7 @@ export function ServerEngagementContent({ serverId }: ServerEngagementContentPro
   }
 
   return (
-    <ServerSettingsLayout
-      title="Engagement"
-      description="Configure how your server welcomes and engages new members."
-    >
+    <div className="flex w-full max-w-160 flex-col gap-5 pb-4">
       <div className="flex flex-col gap-3">
         <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
           System Messages Channel
@@ -287,7 +267,7 @@ export function ServerEngagementContent({ serverId }: ServerEngagementContentPro
         <>
           <Separator />
           <div className="flex gap-2">
-            <Button variant="outline" size="sm" onClick={async () => { setConfig(structuredClone(originalConfig)); await reload() }} disabled={saving}>
+            <Button variant="outline" size="sm" onClick={() => setConfig(structuredClone(originalConfig))} disabled={saving}>
               Reset
             </Button>
             <Button size="sm" onClick={saveSettings} disabled={saving}>
@@ -369,6 +349,6 @@ export function ServerEngagementContent({ serverId }: ServerEngagementContentPro
           </Button>
         </div>
       </div>
-    </ServerSettingsLayout>
+    </div>
   )
 }

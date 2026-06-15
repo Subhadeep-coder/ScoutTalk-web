@@ -11,7 +11,6 @@ import { Separator } from "@/components/ui/separator"
 import { cn } from "@/lib/utils"
 import { useActiveServerStore } from "@/lib/stores/active-server-store"
 import { updateServer, uploadServerAvatar, uploadServerBanner } from "@/lib/services/servers"
-import { ServerSettingsLayout } from "@/components/server/settings/server/server-settings-layout"
 import { ServerPreviewCard } from "@/components/server/settings/server/server-preview-card"
 
 type ServerProfileContentProps = Readonly<{
@@ -111,31 +110,18 @@ export function ServerProfileContent({ serverId }: ServerProfileContentProps) {
   }
 
   return (
-    <ServerSettingsLayout
-      title="Server Profile"
-      description="Tell us about your server. This information will be shown to anyone who visits your server."
-      sidebar={
-        <>
-          <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Preview</p>
-          <ServerPreviewCard
-            name={name}
-            avatarPreview={currentAvatar}
-            bannerPreview={currentBanner}
-            description={description}
+    <div className="flex gap-8">
+      <div className="flex w-full max-w-160 flex-col gap-5 pb-4">
+        <div className="flex flex-col gap-1.5">
+          <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            Server Name
+          </Label>
+          <Input
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
           />
-        </>
-      }
-    >
-      <div className="flex flex-col gap-1.5">
-        <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-          Server Name
-        </Label>
-        <Input
-          type="text"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
-      </div>
+        </div>
 
       <div className="flex flex-col gap-1.5">
         <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
@@ -198,7 +184,7 @@ export function ServerProfileContent({ serverId }: ServerProfileContentProps) {
         <p className="text-xs text-muted-foreground">This image will appear at the top of your server&apos;s profile.</p>
         <div
           className={cn(
-            "group relative mt-1 flex h-[100px] w-full cursor-pointer items-center justify-center overflow-hidden rounded-md border-2 border-dashed border-border bg-muted/30 transition-colors hover:border-muted-foreground/40",
+            "group relative mt-1 flex h-25 w-full cursor-pointer items-center justify-center overflow-hidden rounded-md border-2 border-dashed border-border bg-muted/30 transition-colors hover:border-muted-foreground/40",
             bannerDragging && "border-primary bg-primary/5"
           )}
           onClick={() => bannerInputRef.current?.click()}
@@ -276,6 +262,16 @@ export function ServerProfileContent({ serverId }: ServerProfileContentProps) {
           </Button>
         </div>
       )}
-    </ServerSettingsLayout>
+      </div>
+      <div className="hidden w-70 shrink-0 lg:block">
+        <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Preview</p>
+        <ServerPreviewCard
+          name={name}
+          avatarPreview={currentAvatar}
+          bannerPreview={currentBanner}
+          description={description}
+        />
+      </div>
+    </div>
   )
 }
