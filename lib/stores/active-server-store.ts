@@ -17,6 +17,9 @@ type Channel = {
 export type ActiveServer = {
   id: string
   name: string
+  avatar?: string | null
+  banner?: string | null
+  description?: string | null
   categories: Category[]
   channels: Channel[]
 }

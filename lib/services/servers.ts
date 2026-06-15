@@ -19,3 +19,39 @@ export function uploadServerAvatar(serverId: string, file: File) {
     headers: { "Content-Type": "multipart/form-data" },
   })
 }
+
+export function updateServer(serverId: string, data: { name?: string; description?: string | null; avatar?: string | null; banner?: string | null }) {
+  return apiClient.patch(`/servers/${serverId}`, data)
+}
+
+export function uploadServerBanner(serverId: string, file: File) {
+  const formData = new FormData()
+  formData.append("file", file)
+  return apiClient.post(`/servers/${serverId}/banner`, formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  })
+}
+
+export function getServerSettings(serverId: string) {
+  return apiClient.get(`/servers/${serverId}/settings`)
+}
+
+export function updateServerSettings(serverId: string, data: Record<string, unknown>) {
+  return apiClient.patch(`/servers/${serverId}/settings`, data)
+}
+
+export function getWelcomeMessages(serverId: string) {
+  return apiClient.get(`/servers/${serverId}/welcome-messages`)
+}
+
+export function createWelcomeMessage(serverId: string, data: { content: string; isEnabled: boolean; displayOrder: number }) {
+  return apiClient.post(`/servers/${serverId}/welcome-messages`, data)
+}
+
+export function updateWelcomeMessage(serverId: string, messageId: string, data: { content?: string; isEnabled?: boolean; displayOrder?: number | null }) {
+  return apiClient.patch(`/servers/${serverId}/welcome-messages/${messageId}`, data)
+}
+
+export function deleteWelcomeMessage(serverId: string, messageId: string) {
+  return apiClient.delete(`/servers/${serverId}/welcome-messages/${messageId}`)
+}
