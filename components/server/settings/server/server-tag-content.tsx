@@ -65,7 +65,7 @@ export function ServerTagContent() {
           </div>
         )}
       </div>
-      <div className="hidden w-[280px] shrink-0 lg:block">
+      <div className="hidden w-70 shrink-0 lg:block">
         <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
           {activeServer?.name ?? "Server"}
         </p>
