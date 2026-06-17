@@ -1,12 +1,14 @@
 "use client"
 
-import { useEffect } from "react"
+import { useEffect, useRef } from "react"
 
 import { ServerSidebar } from "@/components/server/sidebar"
 import ChatSection from "@/components/server/chat"
 import { useServerStore } from "@/lib/stores/server-store"
 import { useActiveServerStore } from "@/lib/stores/active-server-store"
 import { getServer } from "@/lib/services/servers"
+import { joinServer, leaveServer } from "@/lib/socket"
+import { useSocketStore } from "@/lib/socket"
 
 type ServerPageContentProps = Readonly<{
   serverId: string
@@ -18,6 +20,8 @@ export function ServerPageContent({ serverId, channelId }: ServerPageContentProp
   const setActiveServer = useActiveServerStore((s) => s.setActiveServer)
   const setActiveServerId = useServerStore((s) => s.setActiveServerId)
   const setActiveChannelId = useActiveServerStore((s) => s.setActiveChannelId)
+  const isConnected = useSocketStore((s) => s.isConnected)
+  const prevServerId = useRef<string | null>(null)
 
   useEffect(() => {
     setActiveServerId(serverId)
@@ -26,6 +30,24 @@ export function ServerPageContent({ serverId, channelId }: ServerPageContentProp
       getServer(serverId).then(({ data }) => setActiveServer(data)).catch(() => {})
     }
   }, [serverId, channelId, setActiveServerId, setActiveChannelId, activeServer, setActiveServer])
+
+  useEffect(() => {
+    if (!isConnected) return
+
+    if (prevServerId.current && prevServerId.current !== serverId) {
+      leaveServer(prevServerId.current)
+    }
+
+    joinServer(serverId)
+    prevServerId.current = serverId
+
+    return () => {
+      if (prevServerId.current) {
+        leaveServer(prevServerId.current)
+        prevServerId.current = null
+      }
+    }
+  }, [serverId, isConnected])
 
   function refetchServer() {
     getServer(serverId).then(({ data }) => setActiveServer(data)).catch(() => {})

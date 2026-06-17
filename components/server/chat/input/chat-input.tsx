@@ -26,7 +26,7 @@ export default function ChatInput({ channelName, channelId }: ChatInputProps) {
   const [attachments, setAttachments] = useState<AttachmentData[]>([])
   const replyTo = useReplyStore((s) => s.replyTo)
   const clearReply = useReplyStore((s) => s.clearReply)
-  const sendAndRefresh = useMessageStore((s) => s.sendAndRefresh)
+  const sendMessageAction = useMessageStore((s) => s.sendMessage)
   const loading = useMessageStore((s) => s.loading)
 
   const sending = loading
@@ -60,7 +60,7 @@ export default function ChatInput({ channelName, channelId }: ChatInputProps) {
     if (!trimmed && attachments.length === 0) return
 
     try {
-      await sendAndRefresh(channelId, trimmed, attachments.length > 0 ? attachments : undefined, replyTo?.messageId)
+      await sendMessageAction(channelId, trimmed, attachments.length > 0 ? attachments : undefined, replyTo?.messageId)
       setMessage("")
       setSelectedFiles([])
       setAttachments([])

@@ -1,6 +1,7 @@
 "use client"
 
 import { AppSidebar } from "@/components/app-sidebar"
+import SocketProvider from "@/components/socket-provider"
 import {
   SidebarInset,
   SidebarProvider,
@@ -13,8 +14,10 @@ export default function AuthenticatedLayout({
 }>) {
   return (
     <SidebarProvider defaultOpen={false} onOpenChange={() => {}}>
-      <AppSidebar />
-      <SidebarInset className="max-h-dvh">{children}</SidebarInset>
+      <SocketProvider>
+        <AppSidebar />
+        <SidebarInset className="max-h-dvh">{children}</SidebarInset>
+      </SocketProvider>
     </SidebarProvider>
   )
 }

@@ -6,7 +6,10 @@ type MessageStore = {
   loading: boolean
   error: string | null
   fetchMessages: (channelId: string) => Promise<void>
-  sendAndRefresh: (channelId: string, content: string, attachments?: AttachmentData[], parentId?: string) => Promise<void>
+  sendMessage: (channelId: string, content: string, attachments?: AttachmentData[], parentId?: string) => Promise<void>
+  addMessage: (message: Message) => void
+  updateMessageInList: (message: Message) => void
+  removeMessageFromList: (id: string, channelId: string) => void
 }
 
 export const useMessageStore = create<MessageStore>((set, get) => ({
@@ -24,8 +27,55 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
     }
   },
 
-  sendAndRefresh: async (channelId: string, content: string, attachments?: AttachmentData[], parentId?: string) => {
-    await sendMessage(channelId, content, attachments, parentId)
-    await get().fetchMessages(channelId)
+  sendMessage: async (channelId: string, content: string, attachments?: AttachmentData[], parentId?: string) => {
+    const { data } = await sendMessage(channelId, content, attachments, parentId)
+    set((state) => {
+      const existing = state.messagesByChannel[channelId] ?? []
+      return {
+        messagesByChannel: {
+          ...state.messagesByChannel,
+          [channelId]: [...existing, data],
+        },
+      }
+    })
+  },
+
+  addMessage: (message) => {
+    set((state) => {
+      const existing = state.messagesByChannel[message.channelId] ?? []
+      if (existing.some((m) => m.id === message.id)) return state
+      return {
+        messagesByChannel: {
+          ...state.messagesByChannel,
+          [message.channelId]: [...existing, message],
+        },
+      }
+    })
+  },
+
+  updateMessageInList: (message) => {
+    set((state) => {
+      const existing = state.messagesByChannel[message.channelId]
+      if (!existing) return state
+      return {
+        messagesByChannel: {
+          ...state.messagesByChannel,
+          [message.channelId]: existing.map((m) => (m.id === message.id ? message : m)),
+        },
+      }
+    })
+  },
+
+  removeMessageFromList: (id, channelId) => {
+    set((state) => {
+      const existing = state.messagesByChannel[channelId]
+      if (!existing) return state
+      return {
+        messagesByChannel: {
+          ...state.messagesByChannel,
+          [channelId]: existing.filter((m) => m.id !== id),
+        },
+      }
+    })
   },
 }))
