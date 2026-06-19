@@ -87,3 +87,44 @@ export function getServerMembers(serverId: string) {
 export function addRoleMembers(serverId: string, roleId: string, data: { memberIds: string[] }) {
   return apiClient.post(`/servers/${serverId}/roles/${roleId}/members`, data)
 }
+
+export function createInvite(serverId: string) {
+  return apiClient.post<{ inviteUrl: string }>(`/servers/${serverId}/invites`)
+}
+
+export function getInvite(code: string) {
+  return apiClient.get<{
+    id: string
+    code: string
+    serverId: string
+    createdBy: string
+    channelId: string | null
+    expiresAt: string
+    maxUses: number | null
+    useCount: number
+    createdAt: string
+    server: {
+      id: string
+      name: string
+      ownerId: string
+      avatar: string | null
+      banner: string | null
+      description: string | null
+      inviteCode: string
+      createdAt: string
+      updatedAt: string
+    }
+    creator: {
+      id: string
+      username: string
+      displayName: string
+      avatar: string | null
+    }
+    inviteUrl: string
+    memberCount: number
+  }>(`/invites/${code}`)
+}
+
+export function acceptInvite(code: string) {
+  return apiClient.post("/invites/join", { code })
+}

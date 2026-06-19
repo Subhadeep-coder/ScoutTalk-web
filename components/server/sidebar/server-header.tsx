@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { CreateChannelDialog } from "@/components/server/sidebar/create-channel-dialog"
 import { CreateCategoryDialog } from "@/components/server/sidebar/create-category-dialog"
+import { InviteDialog } from "@/components/server/sidebar/invite-dialog"
 import { ServerSettingsDialog } from "@/components/server/settings/server/server-settings-dialog"
 import { useActiveServerStore } from "@/lib/stores/active-server-store"
 
@@ -37,10 +38,12 @@ export function ServerHeader({ serverName, onCreated }: ServerHeaderProps) {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent side="bottom" align="center" sideOffset={4} className="w-64">
-          <DropdownMenuItem>
-            <UserPlus className="size-5" />
-            Invite People
-          </DropdownMenuItem>
+          <InviteDialog serverId={serverId}>
+            <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+              <UserPlus className="size-5" />
+              Invite People
+            </DropdownMenuItem>
+          </InviteDialog>
           <DropdownMenuSeparator />
           <CreateChannelDialog categoryName="" serverId={serverId} categories={categories} onCreated={onCreated}>
             <DropdownMenuItem onSelect={(e) => e.preventDefault()}>

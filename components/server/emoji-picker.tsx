@@ -1,6 +1,6 @@
 "use client"
 
-import EmojiPickerReact, { type EmojiClickData } from "emoji-picker-react"
+import EmojiPickerReact, { type EmojiClickData, Theme } from "emoji-picker-react"
 
 import { Button } from "@/components/ui/button"
 import { useTheme } from "@/hooks/use-theme"
@@ -21,7 +21,7 @@ export function EmojiPicker({ onSelect, onClose }: EmojiPickerProps) {
         </Button>
       </div>
       <EmojiPickerReact
-        theme={theme === "dark" ? "dark" : "light"}
+        theme={theme === "dark" ? Theme.DARK : Theme.LIGHT}
         onEmojiClick={(data: EmojiClickData) => {
           onSelect(data.emoji)
           onClose()
