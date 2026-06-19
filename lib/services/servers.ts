@@ -128,3 +128,28 @@ export function getInvite(code: string) {
 export function acceptInvite(code: string) {
   return apiClient.post("/invites/join", { code })
 }
+
+export function getServerInvites(serverId: string) {
+  return apiClient.get<Array<{
+    id: string
+    code: string
+    serverId: string
+    createdBy: string
+    channelId: string | null
+    expiresAt: string
+    maxUses: number | null
+    useCount: number
+    createdAt: string
+    creator: {
+      id: string
+      username: string
+      displayName: string
+      avatar: string | null
+    }
+    inviteUrl: string
+  }>>(`/servers/${serverId}/invites`)
+}
+
+export function deleteInvite(serverId: string, inviteId: string) {
+  return apiClient.delete(`/servers/${serverId}/invites/${inviteId}`)
+}
