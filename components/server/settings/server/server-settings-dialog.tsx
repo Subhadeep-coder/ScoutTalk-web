@@ -11,6 +11,7 @@ import { ServerProfileContent } from "@/components/server/settings/server/server
 import { ServerTagContent } from "@/components/server/settings/server/server-tag-content"
 import { ServerEngagementContent } from "@/components/server/settings/server/server-engagement-content"
 import { ServerRolesContent } from "@/components/server/settings/server/roles/server-roles-content"
+import { ServerMembersContent } from "@/components/server/settings/server/server-members-content"
 import { useActiveServerStore } from "@/lib/stores/active-server-store"
 
 type ServerSettingsDialogProps = Readonly<{
@@ -33,6 +34,8 @@ export function ServerSettingsDialog({ children, serverName }: ServerSettingsDia
         return <ServerTagContent />
       case "engagement":
         return serverId ? <ServerEngagementContent serverId={serverId} /> : null
+      case "members":
+        return serverId ? <ServerMembersContent serverId={serverId} /> : null
       case "roles":
         return serverId ? <ServerRolesContent serverId={serverId} /> : null
       default:
