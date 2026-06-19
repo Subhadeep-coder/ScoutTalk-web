@@ -101,7 +101,7 @@ export function ServerPageContent({ serverId, channelId }: ServerPageContentProp
           </div>
         </main>
       ) : (
-        <ChatSection channelName={activeChannel.name} channelId={channelId} />
+        <ChatSection channelName={activeChannel.name} channelId={channelId} serverId={serverId} />
       )}
     </div>
   )

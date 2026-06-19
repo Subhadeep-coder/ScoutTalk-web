@@ -58,3 +58,11 @@ export function joinServer(serverId: string): void {
 export function leaveServer(serverId: string): void {
   socket?.emit("leaveServer", serverId)
 }
+
+export function startTyping(channelId: string, serverId: string): void {
+  socket?.emit("typing:start", { channelId, serverId })
+}
+
+export function stopTyping(channelId: string, serverId: string): void {
+  socket?.emit("typing:stop", { channelId, serverId })
+}

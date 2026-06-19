@@ -29,15 +29,7 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 
   sendMessage: async (channelId: string, content: string, attachments?: AttachmentData[], parentId?: string) => {
     const { data } = await sendMessage(channelId, content, attachments, parentId)
-    set((state) => {
-      const existing = state.messagesByChannel[channelId] ?? []
-      return {
-        messagesByChannel: {
-          ...state.messagesByChannel,
-          [channelId]: [...existing, data],
-        },
-      }
-    })
+    get().addMessage(data)
   },
 
   addMessage: (message) => {
