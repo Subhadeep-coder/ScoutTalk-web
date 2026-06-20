@@ -22,6 +22,7 @@ import { ChannelItem } from "@/components/server/sidebar/channel-item"
 import { ChannelSettingsDialog } from "@/components/server/settings/channels/channel-settings-dialog"
 import { CreateChannelDialog } from "@/components/server/sidebar/create-channel-dialog"
 import { useActiveServerStore } from "@/lib/stores/active-server-store"
+import { usePermissions } from "@/lib/hooks/use-permissions"
 import { reorderChannels } from "@/lib/services/channels"
 import { cn } from "@/lib/utils"
 
@@ -53,11 +54,12 @@ export function CategorySection({ category, channels, serverId, activeChannelId,
   const [settingsChannelId, setSettingsChannelId] = useState<string | null>(null)
   const setActiveServer = useActiveServerStore((s) => s.setActiveServer)
   const activeServer = useActiveServerStore((s) => s.activeServer)
+  const { can, canInChannel } = usePermissions()
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
   )
   const sortedChannels = [...channels]
-    .filter((c) => c.categoryId === category.id)
+    .filter((c) => c.categoryId === category.id && canInChannel(c.id, "VIEW_CHANNEL"))
     .sort((a, b) => a.position - b.position)
   const channelIds = sortedChannels.map((c) => c.id)
 
@@ -117,11 +119,13 @@ export function CategorySection({ category, channels, serverId, activeChannelId,
             )}
           />
         </button>
-        <CreateChannelDialog categoryName={category.name} categoryId={category.id} serverId={serverId} onCreated={onChannelCreated}>
-          <span className="ml-auto flex size-5 cursor-pointer items-center justify-center text-muted-foreground hover:text-foreground">
-            <Plus className="size-4" />
-          </span>
-        </CreateChannelDialog>
+        {can("MANAGE_CHANNELS") && (
+          <CreateChannelDialog categoryName={category.name} categoryId={category.id} serverId={serverId} onCreated={onChannelCreated}>
+            <span className="ml-auto flex size-5 cursor-pointer items-center justify-center text-muted-foreground hover:text-foreground">
+              <Plus className="size-4" />
+            </span>
+          </CreateChannelDialog>
+        )}
       </div>
       {!collapsed && (
         <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={handleChannelDragEnd}>
@@ -135,6 +139,7 @@ export function CategorySection({ category, channels, serverId, activeChannelId,
                     type={channel.type}
                     serverId={serverId}
                     isActive={channel.id === activeChannelId}
+                    showSettings={can("MANAGE_CHANNELS")}
                     onSettingsClick={() => setSettingsChannelId(channel.id)}
                   />
                 </SortableItem>

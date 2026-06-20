@@ -17,11 +17,14 @@ type Channel = {
 export type ActiveServer = {
   id: string
   name: string
+  ownerId?: string
   avatar?: string | null
   banner?: string | null
   description?: string | null
   categories: Category[]
   channels: Channel[]
+  memberPermissions?: string
+  channelPermissions?: Record<string, string>
 }
 
 type ActiveServerState = {

@@ -14,6 +14,7 @@ import { ServerRolesContent } from "@/components/server/settings/server/roles/se
 import { ServerMembersContent } from "@/components/server/settings/server/server-members-content"
 import { ServerInvitesContent } from "@/components/server/settings/server/server-invites-content"
 import { useActiveServerStore } from "@/lib/stores/active-server-store"
+import { usePermissions } from "@/lib/hooks/use-permissions"
 
 type ServerSettingsDialogProps = Readonly<{
   children: ReactNode
@@ -24,11 +25,23 @@ export function ServerSettingsDialog({ children, serverName }: ServerSettingsDia
   const [open, setOpen] = useState(false)
   const [tab, setTab] = useState<ServerSettingsTab>("server-profile")
   const serverId = useActiveServerStore((s) => s.activeServer?.id)
+  const { can } = usePermissions()
+  const canManageRoles = can("MANAGE_ROLES")
+  const canManageMembers = can("KICK_MEMBERS") || can("BAN_MEMBERS") || can("MANAGE_NICKNAMES") || can("MODERATE_MEMBERS")
+  const canViewAuditLog = can("VIEW_AUDIT_LOG")
 
-  const meta = tabMeta[tab]
+  function resolveTab(): ServerSettingsTab {
+    if (tab === "roles" && !canManageRoles) return "server-profile"
+    if (tab === "members" && !canManageMembers) return "server-profile"
+    if (tab === "audit-log" && !canViewAuditLog) return "server-profile"
+    return tab
+  }
+
+  const resolvedTab = resolveTab()
+  const meta = tabMeta[resolvedTab]
 
   function renderContent() {
-    switch (tab) {
+    switch (resolvedTab) {
       case "server-profile":
         return serverId ? <ServerProfileContent serverId={serverId} /> : null
       case "server-tag":
@@ -58,7 +71,7 @@ export function ServerSettingsDialog({ children, serverName }: ServerSettingsDia
       <DialogContent className="flex h-[90vh] w-[90vw] !max-w-none gap-0 overflow-hidden p-0">
         <DialogTitle className="sr-only">{serverName} Settings</DialogTitle>
         <div onPointerDown={(e) => e.stopPropagation()} className="flex size-full">
-          <ServerSettingsSidebar serverName={serverName} tab={tab} onTabChange={setTab} />
+          <ServerSettingsSidebar serverName={serverName} tab={resolvedTab} onTabChange={setTab} canManageRoles={canManageRoles} canManageMembers={canManageMembers} canViewAuditLog={canViewAuditLog} />
           <SidebarInset className="flex flex-1 p-0">
             <ServerSettingsLayout title={meta.title} description={meta.description}>
               {renderContent()}

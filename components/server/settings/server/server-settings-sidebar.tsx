@@ -1,6 +1,6 @@
 "use client"
 
-import { Fragment } from "react"
+import { Fragment, useMemo } from "react"
 import { BarChart3, FileText, Gavel, Info, Key, Settings, Shield, Smile, Sticker, Tag, Users, UserPlus } from "lucide-react"
 import {
   SidebarContent,
@@ -34,10 +34,13 @@ type ServerSettingsSidebarProps = Readonly<{
   serverName: string
   tab: ServerSettingsTab
   onTabChange: (tab: ServerSettingsTab) => void
+  canManageRoles?: boolean
+  canManageMembers?: boolean
+  canViewAuditLog?: boolean
 }>
 
-export function ServerSettingsSidebar({ serverName, tab, onTabChange }: ServerSettingsSidebarProps) {
-  const sections: Section[] = [
+export function ServerSettingsSidebar({ serverName, tab, onTabChange, canManageRoles, canManageMembers, canViewAuditLog }: ServerSettingsSidebarProps) {
+  const sections: Section[] = useMemo(() => [
     {
       header: serverName,
       items: [
@@ -56,20 +59,20 @@ export function ServerSettingsSidebar({ serverName, tab, onTabChange }: ServerSe
     {
       header: "People",
       items: [
-        { id: "members", label: "Members" },
-        { id: "roles", label: "Roles" },
-        { id: "invites", label: "Invites" },
-        { id: "access", label: "Access" },
+        ...(canManageMembers ? [{ id: "members" as const, label: "Members" }] : []),
+        ...(canManageRoles ? [{ id: "roles" as const, label: "Roles" }] : []),
+        { id: "invites" as const, label: "Invites" },
+        { id: "access" as const, label: "Access" },
       ],
     },
     {
       header: "Moderation",
       items: [
-        { id: "audit-log", label: "Audit Log" },
-        { id: "automod", label: "AutoMod" },
+        ...(canViewAuditLog ? [{ id: "audit-log" as const, label: "Audit Log" }] : []),
+        { id: "automod" as const, label: "AutoMod" },
       ],
     },
-  ]
+  ], [serverName, canManageRoles, canManageMembers, canViewAuditLog])
 
   const iconMap: Record<ServerSettingsTab, typeof Info> = {
     "server-profile": Info,

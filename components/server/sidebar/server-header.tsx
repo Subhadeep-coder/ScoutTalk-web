@@ -15,6 +15,7 @@ import { CreateCategoryDialog } from "@/components/server/sidebar/create-categor
 import { InviteDialog } from "@/components/server/sidebar/invite-dialog"
 import { ServerSettingsDialog } from "@/components/server/settings/server/server-settings-dialog"
 import { useActiveServerStore } from "@/lib/stores/active-server-store"
+import { usePermissions } from "@/lib/hooks/use-permissions"
 
 type ServerHeaderProps = Readonly<{
   serverName: string
@@ -25,6 +26,10 @@ export function ServerHeader({ serverName, onCreated }: ServerHeaderProps) {
   const activeServer = useActiveServerStore((s) => s.activeServer)
   const categories = activeServer?.categories ?? []
   const serverId = activeServer?.id ?? ""
+  const { can } = usePermissions()
+  const canManage = can("MANAGE_CHANNELS")
+  const canManageGuild = can("MANAGE_GUILD")
+  const canInvite = can("CREATE_INSTANT_INVITE")
   return (
     <>
       <DropdownMenu>
@@ -38,36 +43,44 @@ export function ServerHeader({ serverName, onCreated }: ServerHeaderProps) {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent side="bottom" align="center" sideOffset={4} className="w-64">
-          <InviteDialog serverId={serverId}>
-            <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-              <UserPlus className="size-5" />
-              Invite People
-            </DropdownMenuItem>
-          </InviteDialog>
-          <DropdownMenuSeparator />
-          <CreateChannelDialog categoryName="" serverId={serverId} categories={categories} onCreated={onCreated}>
-            <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-              <Plus className="size-5" />
-              Create Channel
-            </DropdownMenuItem>
-          </CreateChannelDialog>
-          <CreateCategoryDialog onCreated={onCreated}>
-            <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-              <FolderPlus className="size-5" />
-              Create Category
-            </DropdownMenuItem>
-          </CreateCategoryDialog>
+          {canInvite && (
+            <InviteDialog serverId={serverId}>
+              <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                <UserPlus className="size-5" />
+                Invite People
+              </DropdownMenuItem>
+            </InviteDialog>
+          )}
+          {canManage && (
+            <>
+              <DropdownMenuSeparator />
+              <CreateChannelDialog categoryName="" serverId={serverId} categories={categories} onCreated={onCreated}>
+                <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                  <Plus className="size-5" />
+                  Create Channel
+                </DropdownMenuItem>
+              </CreateChannelDialog>
+              <CreateCategoryDialog onCreated={onCreated}>
+                <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                  <FolderPlus className="size-5" />
+                  Create Category
+                </DropdownMenuItem>
+              </CreateCategoryDialog>
+            </>
+          )}
           <DropdownMenuSeparator />
           <DropdownMenuItem>
             <Bell className="size-5" />
             Notification Settings
           </DropdownMenuItem>
-          <ServerSettingsDialog serverName={serverName}>
-            <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-              <Settings className="size-5" />
-              Server Settings
-            </DropdownMenuItem>
-          </ServerSettingsDialog>
+          {canManageGuild && (
+            <ServerSettingsDialog serverName={serverName}>
+              <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                <Settings className="size-5" />
+                Server Settings
+              </DropdownMenuItem>
+            </ServerSettingsDialog>
+          )}
           <DropdownMenuSeparator />
           <DropdownMenuItem variant="destructive">
             <LogOut className="size-5" />

@@ -13,6 +13,7 @@ import SendButton from "./send-button"
 import { uploadAttachment, type AttachmentData } from "@/lib/services/messages"
 import { useMessageStore } from "@/lib/stores/message-store"
 import { useReplyStore } from "@/lib/stores/reply-store"
+import { usePermissions } from "@/lib/hooks/use-permissions"
 import { startTyping, stopTyping } from "@/lib/socket"
 
 const TYPING_THROTTLE = 3000
@@ -25,6 +26,10 @@ type ChatInputProps = Readonly<{
 }>
 
 export default function ChatInput({ channelName, channelId, serverId }: ChatInputProps) {
+  const { canInChannel } = usePermissions()
+  const canSend = canInChannel(channelId, "SEND_MESSAGES")
+  const canAttach = canInChannel(channelId, "ATTACH_FILES")
+
   const [message, setMessage] = useState("")
   const lastTypingEmit = useRef(0)
   const idleTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -123,6 +128,16 @@ export default function ChatInput({ channelName, channelId, serverId }: ChatInpu
     }
   }
 
+  if (!canSend) {
+    return (
+      <div className="border-t p-4">
+        <div className="flex items-center justify-center rounded-lg border bg-muted/50 px-3 py-3 text-sm text-muted-foreground">
+          You don&apos;t have permission to send messages in #{channelName}
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="border-t p-4">
       <ReplyBar />
@@ -144,7 +159,7 @@ export default function ChatInput({ channelName, channelId, serverId }: ChatInpu
           </div>
         )}
         <div className="flex items-center gap-1.5">
-          <AttachmentButton onFilesSelect={handleFilesSelect} />
+          {canAttach && <AttachmentButton onFilesSelect={handleFilesSelect} />}
           <EmojiButton onEmojiSelect={(emoji) => setMessage((prev) => prev + emoji)} />
           <GifButton onGifSelect={(url) => console.log("GIF selected:", url)} />
           <MessageInput
