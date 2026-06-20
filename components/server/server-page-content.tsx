@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react"
 
 import { ServerSidebar } from "@/components/server/sidebar"
 import ChatSection from "@/components/server/chat"
+import VoiceHeader from "@/components/server/voice/voice-header"
 import { useServerStore } from "@/lib/stores/server-store"
 import { useActiveServerStore } from "@/lib/stores/active-server-store"
 import { getServer } from "@/lib/services/servers"
@@ -94,10 +95,13 @@ export function ServerPageContent({ serverId, channelId }: ServerPageContentProp
         onChannelCreated={refetchServer}
       />
       {isVoice ? (
-        <main className="flex flex-1 items-center justify-center text-muted-foreground">
-          <div className="flex flex-col items-center gap-2">
-            <p className="text-lg font-medium">Voice Channel</p>
-            <p className="text-sm">Coming soon</p>
+        <main className="flex flex-1 flex-col">
+          <VoiceHeader channelName={activeChannel.name} channelId={channelId} serverId={serverId} />
+          <div className="flex flex-1 items-center justify-center text-muted-foreground">
+            <div className="flex flex-col items-center gap-2">
+              <p className="text-lg font-medium">{activeChannel.name}</p>
+              <p className="text-sm">Voice channel coming soon</p>
+            </div>
           </div>
         </main>
       ) : (

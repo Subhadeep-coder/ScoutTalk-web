@@ -1,9 +1,10 @@
 "use client"
 
-import { Hash, Settings, Volume2 } from "lucide-react"
+import { Hash, MessageCircle, Settings, Volume2 } from "lucide-react"
 import { useRouter } from "next/navigation"
 
 import { cn } from "@/lib/utils"
+import { useServerStore } from "@/lib/stores/server-store"
 
 type ChannelItemProps = Readonly<{
   id: string
@@ -38,18 +39,33 @@ export function ChannelItem({ id, name, type, serverId, isActive, showSettings, 
     >
       <Icon className="size-5" />
       <span className="truncate">{name}</span>
-      {showSettings && (
-        <button
-          type="button"
-          onClick={(e) => {
-            e.stopPropagation()
-            onSettingsClick?.()
-          }}
-          className="ml-3 cursor-pointer opacity-0 transition-opacity group-hover:opacity-100 hover:text-foreground"
-        >
-          <Settings className="size-4" />
-        </button>
-      )}
+      <div className="flex items-center gap-2">
+        {type === "VOICE" && (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation()
+              useServerStore.getState().setPendingVoiceChatChannelId(id)
+              router.push(`/server/${serverId}/${id}`)
+            }}
+            className="cursor-pointer opacity-0 transition-opacity group-hover:opacity-100 hover:text-foreground"
+          >
+            <MessageCircle className="size-4" />
+          </button>
+        )}
+        {showSettings && (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation()
+              onSettingsClick?.()
+            }}
+            className="cursor-pointer opacity-0 transition-opacity group-hover:opacity-100 hover:text-foreground"
+          >
+            <Settings className="size-4" />
+          </button>
+        )}
+      </div>
     </div>
   )
 }
