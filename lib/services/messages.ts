@@ -31,7 +31,7 @@ export type ParentMessage = {
 
 export type Message = {
   id: string
-  authorId: string
+  authorId: string | null
   channelId: string
   serverId: string
   parentId: string | null
@@ -39,9 +39,11 @@ export type Message = {
   content: string | null
   attachments: AttachmentData[] | null
   isEdited: boolean
+  isSystem: boolean
+  systemType: "join" | "boost" | "pin" | "default" | null
   createdAt: string
   updatedAt: string
-  author: MessageAuthor
+  author: MessageAuthor | null
 }
 
 export function getMessages(channelId: string) {

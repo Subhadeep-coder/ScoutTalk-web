@@ -25,23 +25,29 @@ import MessageAuthorInfo from "./message-author"
 import MessageEditInput from "./message-edit-input"
 import MessageReplyIndicator from "./message-reply-indicator"
 import ImagePreviewDialog from "./image-preview-dialog"
+import SystemMessage from "./system-message"
 
 type MessageBubbleProps = Readonly<{
   message: Message
 }>
 
 export default function MessageBubble({ message }: MessageBubbleProps) {
-  const { author } = message
+  const { author, authorId } = message
   const [isEditing, setIsEditing] = useState(false)
   const [editText, setEditText] = useState(message.content ?? "")
   const inputRef = useRef<HTMLInputElement>(null)
   const fetchMessages = useMessageStore((s) => s.fetchMessages)
-  const displayName = author.displayName || `${author.firstName} ${author.lastName}`
   const time = new Date(message.createdAt).toLocaleTimeString([], {
     hour: "2-digit",
     minute: "2-digit",
   })
   const attachments = message.attachments
+
+  if (message.isSystem || !author || !authorId) {
+    return <SystemMessage content={message.content} type={message.systemType ?? "default"} />
+  }
+
+  const displayName = author.displayName ?? `${author.firstName} ${author.lastName}`
 
   function handleStartEdit() {
     setEditText(message.content ?? "")
@@ -178,7 +184,7 @@ export default function MessageBubble({ message }: MessageBubbleProps) {
           <MessageActions
             channelId={message.channelId}
             messageId={message.id}
-            authorId={message.authorId}
+            authorId={authorId}
             authorName={displayName}
             content={message.content}
             onEdit={handleStartEdit}
