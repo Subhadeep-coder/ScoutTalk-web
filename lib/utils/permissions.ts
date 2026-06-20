@@ -111,6 +111,39 @@ export const PERMISSION_LABELS: Record<PermissionKey, string> = {
   USE_EXTERNAL_SOUNDS: "Use External Sounds",
 }
 
+const GENERAL_KEYS: PermissionKey[] = [
+  "VIEW_CHANNEL", "MANAGE_CHANNELS", "MANAGE_ROLES",
+  "CREATE_EXPRESSIONS", "MANAGE_EXPRESSIONS", "VIEW_AUDIT_LOG",
+  "VIEW_SERVER_INSIGHTS", "MANAGE_WEBHOOKS", "MANAGE_GUILD",
+  "CREATE_INSTANT_INVITE", "CHANGE_NICKNAME", "MANAGE_NICKNAMES",
+  "KICK_MEMBERS", "BAN_MEMBERS", "MODERATE_MEMBERS",
+]
+
+const TEXT_KEYS: PermissionKey[] = [
+  "SEND_MESSAGES", "EMBED_LINKS", "ATTACH_FILES", "ADD_REACTIONS",
+  "USE_EXTERNAL_EMOJIS", "USE_EXTERNAL_STICKERS", "MENTION_EVERYONE",
+  "MANAGE_MESSAGES", "READ_MESSAGE_HISTORY", "SEND_TTS_MESSAGES",
+]
+
+const VOICE_KEYS: PermissionKey[] = [
+  "CONNECT", "SPEAK", "VIDEO", "USE_VAD", "PRIORITY_SPEAKER",
+  "MUTE_MEMBERS", "DEAFEN_MEMBERS", "MOVE_MEMBERS",
+  "SET_VOICE_CHANNEL_STATUS", "REQUEST_TO_SPEAK", "USE_SOUNDBOARD", "USE_EXTERNAL_SOUNDS",
+]
+
+export function getChannelPermissionGroups(channelType: "TEXT" | "VOICE") {
+  const groups: { label: string; keys: PermissionKey[] }[] = [
+    { label: "General", keys: GENERAL_KEYS },
+  ]
+  if (channelType === "TEXT") {
+    groups.push({ label: "Text", keys: TEXT_KEYS })
+  } else {
+    groups.push({ label: "Voice", keys: VOICE_KEYS })
+    groups.push({ label: "Voice Text", keys: TEXT_KEYS })
+  }
+  return groups
+}
+
 export const PERMISSION_GROUPS: { label: string; keys: PermissionKey[] }[] = [
   {
     label: "General",

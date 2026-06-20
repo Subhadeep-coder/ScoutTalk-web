@@ -93,7 +93,7 @@ export function ServerRoleAddMembersDialog({
           <ScrollArea className="max-h-60">
             <div className="flex flex-col gap-1 pr-3">
               {filtered.map((member) => {
-                const checked = selectedMemberIds.includes(member.userId)
+                const checked = selectedMemberIds.includes(member.id)
                 return (
                   <label
                     key={member.id}
@@ -103,7 +103,7 @@ export function ServerRoleAddMembersDialog({
                       checked={checked}
                       onCheckedChange={() => {
                         setSelectedMemberIds((prev) =>
-                          checked ? prev.filter((id) => id !== member.userId) : [...prev, member.userId]
+                          checked ? prev.filter((id) => id !== member.id) : [...prev, member.id]
                         )
                       }}
                     />

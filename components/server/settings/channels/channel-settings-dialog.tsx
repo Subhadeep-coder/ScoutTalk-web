@@ -9,6 +9,7 @@ import { SidebarInset, SidebarMenuButton } from "@/components/ui/sidebar"
 import { deleteChannel, updateChannel } from "@/lib/services/channels"
 import { useActiveServerStore } from "@/lib/stores/active-server-store"
 import { ChannelSettingsOverview } from "@/components/server/settings/channels/channel-settings-overview"
+import { ChannelPermissionsContent } from "@/components/server/settings/channels/channel-permissions-content"
 import { ChannelSettingsSidebar } from "@/components/server/settings/channels/channel-settings-sidebar"
 import { DeleteChannelDialog } from "@/components/server/settings/channels/delete-channel-dialog"
 
@@ -111,8 +112,10 @@ export function ChannelSettingsDialog({
                 onReset={() => setEditedName(savedName)}
                 onSave={handleSave}
               />
+            ) : tab === "permissions" ? (
+              <ChannelPermissionsContent channelId={channelId} serverId={serverId} channelType={channelType} />
             ) : (
-              <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
+              <div className="flex flex-1 items-center justify-center text-sm text-muted-foreground">
                 Coming soon
               </div>
             )}
